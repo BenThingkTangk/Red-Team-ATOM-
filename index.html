@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Red Team ATOM — Global AI Threat Range</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+:root {
+  --bg-primary: #0a0e17;
+  --bg-secondary: #0d1321;
+  --bg-panel: rgba(13, 19, 33, 0.92);
+  --accent-cyan: #00f0ff;
+  --accent-magenta: #ff00aa;
+  --accent-red: #ff3344;
+  --accent-orange: #ff8800;
+  --accent-green: #00ff88;
+  --accent-yellow: #ffdd00;
+  --accent-purple: #8855ff;
+  --text-primary: #e8ecf4;
+  --text-secondary: #7a8ba8;
+  --border-color: rgba(0, 240, 255, 0.15);
+  --glow-cyan: 0 0 20px rgba(0, 240, 255, 0.3);
+  --glow-red: 0 0 20px rgba(255, 51, 68, 0.4);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* HEADER */
+.header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: linear-gradient(180deg, rgba(10,14,23,0.98) 0%, rgba(10,14,23,0.85) 100%);
+  border-bottom: 1px solid var(--border-color);
+  padding: 8px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  backdrop-filter: blur(20px);
+}
+
+.header-left {
+  display: flex; align-items: center; gap: 16px;
+}
+
+.logo-mark {
+  width: 36px; height: 36px;
+  background: conic-gradient(from 0deg, var(--accent-cyan), var(--accent-magenta), var(--accent-cyan));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  animation: logoSpin 8s linear infinite;
+  position: relative;
+}
+.logo-mark::after {
+  content: '⚛';
+  font-size: 18px;
+  color: var(--bg-primary);
+}
+@keyframes logoSpin {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+.brand-text {
+  display: flex; flex-direction: column;
+}
+.brand-name {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 4px;
+  background: linear-gradient(90deg, var(--accent-cyan), #fff, var(--accent-magenta));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.brand-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-secondary);
+  letter-spacing: 2px;
+}
+
+.header-center {
+  display: flex; align-items: center; gap: 24px;
+}
+
+.threat-level-badge {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,51,68,0.1);
+  border: 1px solid rgba(255,51,68,0.3);
+  border-radius: 20px;
+  padding: 4px 14px;
+  animation: threatPulse 2s ease-in-out infinite;
+}
+@keyframes threatPulse {
+  0%,100% { box-shadow: 0 0 5px rgba(255,51,68,0.2); }
+  50% { box-shadow: 0 0 20px rgba(255,51,68,0.5); }
+}
+.threat-dot {
+  width: 8px; height: 8px;
+  background: var(--accent-red);
+  border-radius: 50%;
+  animation: blink 1s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.threat-label {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px; font-weight: 700;
+  color: var(--accent-red);
+  letter-spacing: 2px;
+}
+
+.stat-chips {
+  display: flex; gap: 16px;
+}
+.stat-chip {
+  display: flex; flex-direction: column; align-items: center;
+}
+.stat-val {
+  font-family: 'Orbitron', monospace;
+  font-size: 16px; font-weight: 700;
+  color: var(--accent-cyan);
+}
+.stat-label {
+  font-size: 8px; letter-spacing: 1.5px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.header-right {
+  display: flex; align-items: center; gap: 12px;
+}
+.eco-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  padding: 3px 10px;
+  border-radius: 10px;
+  border: 1px solid;
+  letter-spacing: 1px;
+}
+.eco-atom { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+
+.datetime {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+/* MAP CONTAINER */
+.map-container {
+  position: absolute;
+  top: 56px; left: 0; right: 0; bottom: 0;
+}
+
+canvas#globeCanvas {
+  width: 100%; height: 100%;
+  background: radial-gradient(ellipse at center, #0d1a2d 0%, #060a12 70%);
+}
+
+/* ATTACK LINES SVG OVERLAY */
+svg#attackOverlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+
+/* SIDE PANELS */
+.panel {
+  position: absolute;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(16px);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.panel-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--accent-cyan);
+}
+.panel-indicator {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  animation: blink 1.5s infinite;
+}
+
+/* LEFT PANEL: AI ATTACK FEED */
+.panel-left {
+  top: 66px; left: 10px; width: 320px; bottom: 10px;
+}
+.attack-feed {
+  padding: 6px;
+  overflow-y: auto;
+  max-height: calc(100vh - 220px);
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-cyan) transparent;
+}
+.attack-feed::-webkit-scrollbar { width: 3px; }
+.attack-feed::-webkit-scrollbar-thumb { background: var(--accent-cyan); border-radius: 3px; }
+
+.attack-entry {
+  padding: 8px 10px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  border-left: 3px solid;
+  background: rgba(0,0,0,0.3);
+  animation: fadeSlideIn 0.4s ease-out;
+  font-size: 11px;
+  transition: background 0.2s;
+}
+.attack-entry:hover { background: rgba(0, 240, 255, 0.05); }
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.attack-entry.critical { border-color: var(--accent-red); }
+.attack-entry.high { border-color: var(--accent-orange); }
+.attack-entry.medium { border-color: var(--accent-yellow); }
+.attack-entry.low { border-color: var(--accent-green); }
+
+.attack-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 4px;
+}
+.attack-type {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  font-size: 10px;
+}
+.attack-entry.critical .attack-type { color: var(--accent-red); }
+.attack-entry.high .attack-type { color: var(--accent-orange); }
+.attack-entry.medium .attack-type { color: var(--accent-yellow); }
+.attack-entry.low .attack-type { color: var(--accent-green); }
+
+.attack-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-secondary);
+}
+.attack-route {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-bottom: 3px;
+}
+.attack-route span { color: var(--text-primary); font-weight: 500; }
+.attack-detail {
+  font-size: 9px;
+  color: var(--text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.4;
+}
+.attack-tags {
+  display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap;
+}
+.attack-tag {
+  font-size: 8px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.5px;
+}
+.tag-mitre { background: rgba(136,85,255,0.2); color: var(--accent-purple); }
+.tag-atlas { background: rgba(0,240,255,0.15); color: var(--accent-cyan); }
+.tag-ai { background: rgba(255,0,170,0.15); color: var(--accent-magenta); }
+.tag-agent { background: rgba(0,255,136,0.15); color: var(--accent-green); }
+.tag-quantum { background: rgba(0,255,255,0.15); color: var(--accent-cyan); }
+
+/* RIGHT PANEL: AI AGENT LOGS & ANALYTICS */
+.panel-right {
+  top: 66px; right: 10px; width: 320px; bottom: 10px;
+  display: flex; flex-direction: column;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 8px;
+}
+.analytic-card {
+  background: rgba(0,0,0,0.3);
+  border-radius: 6px;
+  padding: 8px 10px;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+.analytic-card .val {
+  font-family: 'Orbitron', monospace;
+  font-size: 18px;
+  font-weight: 700;
+}
+.analytic-card .label {
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.agent-log-section {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.agent-log-section .panel-header { border-top: 1px solid var(--border-color); }
+
+.agent-logs {
+  padding: 6px;
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-magenta) transparent;
+}
+.agent-logs::-webkit-scrollbar { width: 3px; }
+.agent-logs::-webkit-scrollbar-thumb { background: var(--accent-magenta); border-radius: 3px; }
+
+.agent-log {
+  padding: 6px 8px;
+  margin-bottom: 3px;
+  border-radius: 4px;
+  background: rgba(0,0,0,0.25);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  line-height: 1.5;
+  animation: fadeSlideIn 0.3s ease-out;
+  border-left: 2px solid var(--accent-magenta);
+}
+.agent-name {
+  font-weight: 600;
+  color: var(--accent-magenta);
+}
+.agent-action {
+  color: var(--text-secondary);
+}
+.agent-result {
+  color: var(--accent-green);
+}
+.agent-warning {
+  color: var(--accent-orange);
+}
+
+/* BOTTOM PANEL: MITRE ATLAS HEATMAP */
+.panel-bottom {
+  position: absolute;
+  bottom: 10px;
+  left: 340px;
+  right: 340px;
+  height: 120px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(16px);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+.heatmap-container {
+  display: flex;
+  padding: 6px 10px;
+  gap: 3px;
+  flex: 1;
+  align-items: flex-end;
+}
+.heatmap-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.heatmap-bar {
+  width: 100%;
+  border-radius: 2px;
+  min-height: 4px;
+  transition: height 0.5s ease, background 0.5s ease;
+}
+.heatmap-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7px;
+  color: var(--text-secondary);
+  text-align: center;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  max-height: 60px;
+  overflow: hidden;
+}
+
+/* FLOATING ATTACK ARCS */
+.attack-arc {
+  fill: none;
+  stroke-linecap: round;
+  animation: arcDash 2s linear forwards;
+  opacity: 0;
+}
+@keyframes arcDash {
+  0% { stroke-dashoffset: 1000; opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.6; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+/* PULSING DOTS ON MAP */
+.map-dot {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.map-dot::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  animation: dotPulse 2s ease-out infinite;
+}
+@keyframes dotPulse {
+  0% { width: 100%; height: 100%; opacity: 1; box-shadow: 0 0 10px currentColor; }
+  100% { width: 400%; height: 400%; opacity: 0; box-shadow: 0 0 30px currentColor; }
+}
+
+/* ECOSYSTEM STRIP (Red Team ATOM + PQC) */
+.eco-strip {
+  position: absolute;
+  top: 66px;
+  left: 340px;
+  right: 340px;
+  display: flex;
+  gap: 8px;
+  padding: 0 8px;
+}
+.eco-module {
+  flex: 1;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  backdrop-filter: blur(10px);
+}
+.eco-icon {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.eco-icon.atom-bg { background: linear-gradient(135deg, rgba(0,240,255,0.2), rgba(0,240,255,0.05)); }
+.eco-icon.pqc-bg { background: linear-gradient(135deg, rgba(255,136,0,0.2), rgba(255,136,0,0.05)); }
+.eco-module-info { display: flex; flex-direction: column; }
+.eco-module-name {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 1px;
+}
+.eco-module-status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  color: var(--accent-green);
+}
+
+/* Tooltip */
+.tooltip {
+  position: fixed;
+  background: rgba(10,14,23,0.95);
+  border: 1px solid var(--accent-cyan);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 11px;
+  max-width: 280px;
+  z-index: 999;
+  pointer-events: none;
+  display: none;
+  box-shadow: var(--glow-cyan);
+}
+
+/* Scanline effect */
+.scanline {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 50;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 240, 255, 0.01) 2px,
+    rgba(0, 240, 255, 0.01) 4px
+  );
+}
+
+/* Filter controls */
+.filter-bar {
+  padding: 6px 10px;
+  display: flex; gap: 4px; flex-wrap: wrap;
+  border-bottom: 1px solid var(--border-color);
+}
+.filter-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+.filter-btn.active {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  background: rgba(0,240,255,0.1);
+}
+.filter-btn:hover {
+  border-color: var(--accent-cyan);
+  color: var(--text-primary);
+}
+</style>
+</head>
+<body>
+
+<div class="scanline"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo-mark"></div>
+    <div class="brand-text">
+      <div class="brand-name">Red Team ATOM</div>
+      <div class="brand-sub">AUTONOMOUS QUANTUM-READY RED TEAM RANGE</div>
+    </div>
+  </div>
+  <div class="header-center">
+    <div class="threat-level-badge">
+      <div class="threat-dot"></div>
+      <span class="threat-label" id="threatLevel">ELEVATED</span>
+    </div>
+    <div class="stat-chips">
+      <div class="stat-chip">
+        <span class="stat-val" id="totalAttacks">0</span>
+        <span class="stat-label">Attacks/24h</span>
+      </div>
+      <div class="stat-chip">
+        <span class="stat-val" id="aiAssisted" style="color:var(--accent-magenta)">0</span>
+        <span class="stat-label">AI-Assisted</span>
+      </div>
+      <div class="stat-chip">
+        <span class="stat-val" id="agentsActive" style="color:var(--accent-green)">0</span>
+        <span class="stat-label">Agents Active</span>
+      </div>
+      <div class="stat-chip">
+        <span class="stat-val" id="modelsScanned" style="color:var(--accent-purple)">0</span>
+        <span class="stat-label">Models Scanned</span>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="eco-badge eco-atom">ATOM</span>
+    <div class="datetime" id="datetime"></div>
+  </div>
+</div>
+
+<!-- ECOSYSTEM STRIP: Red Team ATOM + PQC -->
+<div class="eco-strip">
+  <div class="eco-module">
+    <div class="eco-icon atom-bg">⚛️</div>
+    <div class="eco-module-info">
+      <span class="eco-module-name" style="color:var(--accent-cyan)">Red Team ATOM</span>
+      <span class="eco-module-status" id="atomStatus">Active adversarial simulation</span>
+    </div>
+  </div>
+  <div class="eco-module">
+    <div class="eco-icon pqc-bg">🔐</div>
+    <div class="eco-module-info">
+      <span class="eco-module-name" style="color:var(--accent-orange)">PQC ENGINE</span>
+      <span class="eco-module-status" id="pqcStatus">Lattice-based key rotation · HARVEST-NOW-DECRYPT-LATER SAFE</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAP -->
+<div class="map-container">
+  <canvas id="globeCanvas"></canvas>
+  <svg id="attackOverlay"></svg>
+</div>
+
+<!-- LEFT PANEL -->
+<div class="panel panel-left">
+  <div class="panel-header">
+    <span class="panel-title">⚡ AI & QUANTUM ATTACK TELEMETRY</span>
+    <span class="panel-indicator"></span>
+  </div>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="setFilter('all')">ALL</button>
+    <button class="filter-btn" onclick="setFilter('critical')">CRITICAL</button>
+    <button class="filter-btn" onclick="setFilter('ai-assisted')">AI-ASSISTED</button>
+    <button class="filter-btn" onclick="setFilter('model-attack')">MODEL ATTACK</button>
+    <button class="filter-btn" onclick="setFilter('agent')">AGENT-LEVEL</button>
+    <button class="filter-btn" onclick="setFilter('quantum')">QUANTUM</button>
+  </div>
+  <div class="attack-feed" id="attackFeed"></div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="panel panel-right">
+  <div class="panel-header">
+    <span class="panel-title">📊 THREAT ANALYTICS</span>
+    <span class="panel-indicator"></span>
+  </div>
+  <div class="analytics-grid">
+    <div class="analytic-card">
+      <div class="val" style="color:var(--accent-red)" id="critCount">0</div>
+      <div class="label">Critical</div>
+    </div>
+    <div class="analytic-card">
+      <div class="val" style="color:var(--accent-orange)" id="highCount">0</div>
+      <div class="label">High</div>
+    </div>
+    <div class="analytic-card">
+      <div class="val" style="color:var(--accent-cyan)" id="modelAttacks">0</div>
+      <div class="label">Model Attacks</div>
+    </div>
+    <div class="analytic-card">
+      <div class="val" style="color:var(--accent-magenta)" id="promptInj">0</div>
+      <div class="label">Prompt Inject</div>
+    </div>
+  </div>
+
+  <div class="panel-header" style="border-top: 1px solid var(--border-color);">
+    <span class="panel-title">🎯 TOP TARGETED ENDPOINTS</span>
+  </div>
+  <div id="targetedModels" style="padding: 6px 10px; font-size: 10px;"></div>
+
+  <div class="agent-log-section">
+    <div class="panel-header">
+      <span class="panel-title" style="color:var(--accent-magenta)">🤖 RED TEAM ATOM DEFENSE LOG</span>
+      <span class="panel-indicator" style="background:var(--accent-magenta)"></span>
+    </div>
+    <div class="agent-logs" id="agentLogs"></div>
+  </div>
+</div>
+
+<!-- BOTTOM: ATLAS HEATMAP -->
+<div class="panel-bottom">
+  <div class="panel-header">
+    <span class="panel-title">🗺️ MITRE ATLAS & QUANTUM TECHNIQUE HEATMAP</span>
+    <span style="font-family:'JetBrains Mono';font-size:8px;color:var(--text-secondary)">LAST 60 MIN</span>
+  </div>
+  <div class="heatmap-container" id="atlasHeatmap"></div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// GEO CITIES
+const CITIES = [
+  {name:"Beijing",country:"CN",lat:39.9,lon:116.4},
+  {name:"Shanghai",country:"CN",lat:31.2,lon:121.5},
+  {name:"Moscow",country:"RU",lat:55.8,lon:37.6},
+  {name:"St Petersburg",country:"RU",lat:59.9,lon:30.3},
+  {name:"Tehran",country:"IR",lat:35.7,lon:51.4},
+  {name:"Pyongyang",country:"KP",lat:39.0,lon:125.8},
+  {name:"Lagos",country:"NG",lat:6.5,lon:3.4},
+  {name:"Mumbai",country:"IN",lat:19.1,lon:72.9},
+  {name:"São Paulo",country:"BR",lat:-23.6,lon:-46.6},
+  {name:"London",country:"GB",lat:51.5,lon:-0.1},
+  {name:"Berlin",country:"DE",lat:52.5,lon:13.4},
+  {name:"Tokyo",country:"JP",lat:35.7,lon:139.7},
+  {name:"Seoul",country:"KR",lat:37.6,lon:127.0},
+  {name:"Singapore",country:"SG",lat:1.3,lon:103.8},
+  {name:"Tel Aviv",country:"IL",lat:32.1,lon:34.8},
+  {name:"Bucharest",country:"RO",lat:44.4,lon:26.1},
+  {name:"Hanoi",country:"VN",lat:21.0,lon:105.9},
+  {name:"Riyadh",country:"SA",lat:24.7,lon:46.7},
+  {name:"Islamabad",country:"PK",lat:33.7,lon:73.1},
+  {name:"Kyiv",country:"UA",lat:50.5,lon:30.5},
+  {name:"New York",country:"US",lat:40.7,lon:-74.0},
+  {name:"San Francisco",country:"US",lat:37.8,lon:-122.4},
+  {name:"Washington DC",country:"US",lat:38.9,lon:-77.0},
+  {name:"Chicago",country:"US",lat:41.9,lon:-87.6},
+  {name:"Toronto",country:"CA",lat:43.7,lon:-79.4},
+  {name:"Sydney",country:"AU",lat:-33.9,lon:151.2},
+  {name:"Paris",country:"FR",lat:48.9,lon:2.4},
+  {name:"Amsterdam",country:"NL",lat:52.4,lon:4.9},
+  {name:"Stockholm",country:"SE",lat:59.3,lon:18.1},
+  {name:"Taipei",country:"TW",lat:25.0,lon:121.5},
+  {name:"Jakarta",country:"ID",lat:-6.2,lon:106.8},
+  {name:"Bangkok",country:"BK",lat:13.8,lon:100.5},
+  {name:"Dubai",country:"AE",lat:25.2,lon:55.3},
+  {name:"Cape Town",country:"ZA",lat:-33.9,lon:18.4},
+  {name:"Mexico City",country:"MX",lat:19.4,lon:-99.1},
+  {name:"Buenos Aires",country:"AR",lat:-34.6,lon:-58.4},
+  {name:"Lima",country:"PE",lat:-12.0,lon:-77.0},
+  {name:"Tallinn",country:"EE",lat:59.4,lon:24.7},
+  {name:"Warsaw",country:"PL",lat:52.2,lon:21.0},
+  {name:"Helsinki",country:"FI",lat:60.2,lon:24.9}
+];
+
+// AI-SPECIFIC ATTACK TYPES (MITRE ATLAS + Custom)
+const AI_ATTACKS = [
+  {type:"Prompt Injection",severity:"critical",category:"ai-assisted",mitre:"AML.T0051",atlas:true,
+   desc:"Multi-stage prompt injection targeting LLM guardrails via nested instruction bypass."},
+  {type:"Model Poisoning",severity:"critical",category:"model-attack",mitre:"AML.T0020",atlas:true,
+   desc:"Training data contamination detected in federated learning pipeline."},
+  {type:"Adversarial Evasion",severity:"high",category:"model-attack",mitre:"AML.T0015",atlas:true,
+   desc:"Adversarial perturbation evading vision model classification boundary."},
+  {type:"Agent Hijacking",severity:"critical",category:"agent",mitre:"AML.T0054",atlas:true,
+   desc:"Autonomous agent tool-use chain redirected via context window manipulation."},
+  {type:"LLM Jailbreak",severity:"high",category:"ai-assisted",mitre:"AML.T0051.001",atlas:true,
+   desc:"Jailbreak attempt against production RAG endpoint."},
+  {type:"Data Exfiltration via AI",severity:"critical",category:"ai-assisted",mitre:"T1041",atlas:false,
+   desc:"Steganographic channel embedding data into model responses."},
+  {type:"Model Theft",severity:"high",category:"model-attack",mitre:"AML.T0044",atlas:true,
+   desc:"API probing to reconstruct proprietary model via distillation."},
+  {type:"Supply Chain - ML Pipeline",severity:"critical",category:"model-attack",mitre:"AML.T0010",atlas:true,
+   desc:"Compromised dependency injecting backdoor triggers during training."},
+  {type:"AI-Powered Phishing",severity:"high",category:"ai-assisted",mitre:"T1566",atlas:false,
+   desc:"AI-generated spear-phishing with real-time persona adaptation."},
+  {type:"Deepfake Social Eng",severity:"high",category:"ai-assisted",mitre:"T1598",atlas:false,
+   desc:"Voice/video deepfake used for executive impersonation."},
+  {type:"RAG Poisoning",severity:"critical",category:"agent",mitre:"AML.T0020.001",atlas:true,
+   desc:"Malicious documents injected into retrieval corpus altering answers."},
+  {type:"Membership Inference",severity:"medium",category:"model-attack",mitre:"AML.T0024",atlas:true,
+   desc:"Privacy attack inferring training data membership via outputs."},
+  {type:"Model Inversion",severity:"high",category:"model-attack",mitre:"AML.T0024.001",atlas:true,
+   desc:"Reconstructing sensitive training data from gradients and outputs."},
+  {type:"Sponge Attack",severity:"medium",category:"model-attack",mitre:"AML.T0029",atlas:true,
+   desc:"Resource exhaustion via inputs maximizing inference compute."},
+  {type:"Backdoor ML Model",severity:"critical",category:"model-attack",mitre:"AML.T0018",atlas:true,
+   desc:"Trojan trigger pattern detected in fine-tuned model checkpoint."},
+  {type:"AI Worm Propagation",severity:"critical",category:"agent",mitre:"AML.T0054.002",atlas:true,
+   desc:"Self-replicating prompts spreading through connected agents."},
+  {type:"Tool-Use Exploit",severity:"high",category:"agent",mitre:"AML.T0054.001",atlas:true,
+   desc:"Agent manipulated into unauthorized system commands via tool chain."},
+  {type:"Context Poisoning",severity:"high",category:"agent",mitre:"AML.T0056",atlas:true,
+   desc:"Long-term memory manipulation altering agent behavior."},
+  {type:"Gradient Leakage",severity:"medium",category:"model-attack",mitre:"AML.T0024.002",atlas:true,
+   desc:"Federated gradient interception exposing private samples."},
+  {type:"AI C2 Channel",severity:"critical",category:"ai-assisted",mitre:"T1071",atlas:false,
+   desc:"LLM-mediated command-and-control using natural language API calls."},
+  {type:"Autonomous Recon",severity:"medium",category:"ai-assisted",mitre:"T1595",atlas:false,
+   desc:"AI agent performing automated reconnaissance & vuln scanning."},
+  {type:"Polymorphic AI Malware",severity:"critical",category:"ai-assisted",mitre:"T1027",atlas:false,
+   desc:"ML-generated polymorphic payload evading signature detection."},
+];
+
+// QUANTUM / PQC ATTACK TYPES (Quantum AI + PQC)
+const QUANTUM_ATTACKS = [
+  {type:"Quantum-Accelerated Key Harvesting",severity:"critical",category:"quantum",mitre:"T1557-Q",atlas:false,
+   desc:"Adversary using quantum resources to accelerate harvest-now-decrypt-later campaign against legacy RSA/ECC."},
+  {type:"Lattice Parameter Downgrade",severity:"high",category:"quantum",mitre:"T1600-Q",atlas:false,
+   desc:"Protocol downgrade attempt forcing migration away from PQC suite to weaker classical key exchange."},
+  {type:"Hybrid Quantum-AI Deepfake",severity:"high",category:"quantum",mitre:"T1566-Q",atlas:false,
+   desc:"Quantum-boosted model generating ultra-realistic executive deepfake for BEC operations."},
+  {type:"Quantum ML Evasion",severity:"medium",category:"quantum",mitre:"AML.Q0015",atlas:true,
+   desc:"Adversarial examples tuned against quantum-enhanced anomaly detector to evade classification."},
+  {type:"PQC Oracle Abuse",severity:"critical",category:"quantum",mitre:"T1203-Q",atlas:false,
+   desc:"Adversary probing PQC key encapsulation as an oracle to infer internal parameters."},
+];
+
+const ATLAS_TECHNIQUES = [
+  "Prompt Injection","Data Poisoning","Model Evasion","Model Theft",
+  "Backdoor ML","Supply Chain ML","Membership Inference","Model Inversion",
+  "Agent Hijack","RAG Poisoning","Sponge Attack","Gradient Leak",
+  "Context Poison","Tool Exploit","LLM Jailbreak","Quantum/PQC"
+];
+
+// RED TEAM ATOM AGENTS
+const AGENTS = [
+  {name:"ATOM-Hunter",color:"var(--accent-cyan)",role:"Proactive Threat Hunter"},
+  {name:"ATOM-Strike",color:"var(--accent-red)",role:"Active Response Orchestrator"},
+  {name:"ATOM-Alpha",color:"var(--accent-purple)",role:"Global Attack Chain Reasoner"},
+  {name:"ATOM-HVT",color:"var(--accent-orange)",role:"High-Value Target Guardian"},
+  {name:"ATOM-Sigma",color:"var(--accent-green)",role:"Model Integrity Sentinel"},
+  {name:"ATOM-Gamma",color:"var(--accent-yellow)",role:"Quantum Risk Analyzer"},
+];
+
+const AGENT_ACTIONS = [
+  "Intercepted {type} — PQC engine rotated lattice keys in 12.3 ms",
+  "ATOM defense mesh neutralized {type} before lateral movement",
+  "Classified threat vector as {type} with 98.7% confidence",
+  "Deployed quantum-safe tunnel for {dst} — legacy cipher deprecated",
+  "Correlating {src} → {dst} attack chain with MITRE ATLAS {mitre}",
+  "Escalated to HVT watchlist — ATOM-HVT shadowing impacted identities",
+  "Quantum risk score spike detected — rerouting traffic through PQC engine",
+  "Red Team ATOM sandboxed payload for continuous adversarial training",
+  "LLM honeypot engaged attacker — harvesting quantum-AI TTPs",
+  "Gradient anomaly indicates quantum-accelerated probing — throttling source",
+  "Backpressure applied at API edge — AI worm propagation halted",
+  "PQC ENGINE validated key schedule — no downgrade detected",
+  "RAG corpus integrity check: quantum-labeled docs verified clean",
+  "Cross-domain correlation shows {type} blocked at pre-execution stage",
+];
+
+const TARGET_MODELS = [
+  {name:"GPT-4o Endpoint",attacks:0,color:"var(--accent-red)"},
+  {name:"Claude Prod API",attacks:0,color:"var(--accent-orange)"},
+  {name:"Gemini Vision",attacks:0,color:"var(--accent-yellow)"},
+  {name:"ATOM-Core v3.1",attacks:0,color:"var(--accent-cyan)"},
+  {name:"LLaMA-3 Fine-tune",attacks:0,color:"var(--accent-purple)"},
+  {name:"PQC Engine",attacks:0,color:"var(--accent-green)"},
+  {name:"Mistral-Large",attacks:0,color:"var(--accent-magenta)"},
+];
+
+// STATE
+let state = {
+  totalAttacks: 14847,
+  aiAssisted: 3291,
+  agentsActive: 6,
+  modelsScanned: 847,
+  critCount: 0,
+  highCount: 0,
+  modelAttacks: 0,
+  promptInj: 0,
+  atlasHeat: {},
+  filter: 'all',
+};
+
+ATLAS_TECHNIQUES.forEach(t => state.atlasHeat[t] = Math.floor(Math.random() * 40) + 5);
+
+// UTIL
+function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function timestamp() {
+  const d = new Date();
+  return d.toLocaleTimeString('en-US', {hour12:false}) + '.' + String(d.getMilliseconds()).padStart(3,'0');
+}
+function genIP() {
+  return `${randInt(1,223)}.${randInt(0,255)}.${randInt(0,255)}.${randInt(1,254)}`;
+}
+
+// MAP
+const canvas = document.getElementById('globeCanvas');
+const ctx = canvas.getContext('2d');
+const svg = document.getElementById('attackOverlay');
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  svg.setAttribute('viewBox', `0 0 ${window.innerWidth} ${window.innerHeight}`);
+}
+window.addEventListener('resize', () => { resizeCanvas(); drawMap(); });
+resizeCanvas();
+
+function project(lat, lon) {
+  const x = (lon + 180) / 360 * canvas.width;
+  const y = (1 - (Math.log(Math.tan(Math.PI/4 + lat * Math.PI/360)) / Math.PI)) / 2 * canvas.height;
+  return {x, y};
+}
+
+function generateRegionDots(latMin, latMax, lonMin, lonMax, density) {
+  const dots = [];
+  const step = 2;
+  for (let lat = latMin; lat <= latMax; lat += step) {
+    for (let lon = lonMin; lon <= lonMax; lon += step) {
+      if (Math.random() < density) dots.push({lat, lon});
+    }
+  }
+  return dots;
+}
+const worldDots = [
+  ...generateRegionDots(25, 70, -170, -50, 0.65),
+  ...generateRegionDots(-55, 15, -82, -35, 0.6),
+  ...generateRegionDots(35, 72, -10, 40, 0.75),
+  ...generateRegionDots(-35, 37, -18, 52, 0.6),
+  ...generateRegionDots(5, 75, 40, 180, 0.55),
+  ...generateRegionDots(-45, -10, 112, 155, 0.6),
+];
+
+function drawMap() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const grad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, canvas.width * 0.7);
+  grad.addColorStop(0, '#0d1a2d');
+  grad.addColorStop(1, '#060a12');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.strokeStyle = 'rgba(0, 240, 255, 0.03)';
+  ctx.lineWidth = 0.5;
+  for (let lat = -80; lat <= 80; lat += 20) {
+    ctx.beginPath();
+    const p1 = project(lat, -180);
+    const p2 = project(lat, 180);
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.stroke();
+  }
+  for (let lon = -180; lon <= 180; lon += 30) {
+    ctx.beginPath();
+    const p1 = project(-80, lon);
+    const p2 = project(80, lon);
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.stroke();
+  }
+
+  worldDots.forEach(d => {
+    const p = project(d.lat, d.lon);
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.12)';
+    ctx.fillRect(p.x, p.y, 2, 2);
+  });
+
+  CITIES.forEach(city => {
+    const p = project(city.lat, city.lon);
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.4)';
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+// ATTACK ARCS
+let arcId = 0;
+function createAttackArc(from, to, severity, isQuantum=false) {
+  const p1 = project(from.lat, from.lon);
+  const p2 = project(to.lat, to.lon);
+
+  const midX = (p1.x + p2.x) / 2;
+  const midY = (p1.y + p2.y) / 2;
+  const dist = Math.sqrt((p2.x-p1.x)**2 + (p2.y-p1.y)**2);
+  const curveHeight = Math.min(dist * 0.3, 100);
+  const cpX = midX;
+  const cpY = midY - curveHeight;
+
+  const colors = {
+    critical: isQuantum ? '#00f0ff' : '#ff3344',
+    high: isQuantum ? '#00bfff' : '#ff8800',
+    medium: isQuantum ? '#33ffdd' : '#ffdd00',
+    low: '#00ff88'
+  };
+  const color = colors[severity] || colors.medium;
+
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', `M ${p1.x} ${p1.y} Q ${cpX} ${cpY} ${p2.x} ${p2.y}`);
+  path.setAttribute('stroke', color);
+  path.setAttribute('stroke-width', severity === 'critical' ? '2.5' : '1.5');
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke-linecap', 'round');
+  path.setAttribute('opacity', '0');
+  path.setAttribute('filter', `drop-shadow(0 0 4px ${color})`);
+
+  const length = path.getTotalLength ? path.getTotalLength() : dist;
+  path.style.strokeDasharray = length;
+  path.style.strokeDashoffset = length;
+
+  svg.appendChild(path);
+
+  requestAnimationFrame(() => {
+    path.style.transition = 'stroke-dashoffset 1.8s ease-in-out, opacity 0.3s';
+    path.style.opacity = '0.7';
+    path.style.strokeDashoffset = '0';
+  });
+
+  drawPulse(p1.x, p1.y, color);
+  setTimeout(() => drawPulse(p2.x, p2.y, color), 900);
+
+  setTimeout(() => {
+    path.style.opacity = '0';
+    setTimeout(() => path.remove(), 500);
+  }, 2500);
+}
+
+function drawPulse(x, y, color) {
+  const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  circle.setAttribute('cx', x);
+  circle.setAttribute('cy', y);
+  circle.setAttribute('r', '3');
+  circle.setAttribute('fill', color);
+  circle.setAttribute('opacity', '0.8');
+  circle.setAttribute('filter', `drop-shadow(0 0 6px ${color})`);
+  svg.appendChild(circle);
+
+  const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  ring.setAttribute('cx', x);
+  ring.setAttribute('cy', y);
+  ring.setAttribute('r', '3');
+  ring.setAttribute('fill', 'none');
+  ring.setAttribute('stroke', color);
+  ring.setAttribute('stroke-width', '1');
+  ring.setAttribute('opacity', '0.6');
+  svg.appendChild(ring);
+
+  let r = 3;
+  let op = 0.6;
+  const animate = () => {
+    r += 0.8;
+    op -= 0.02;
+    ring.setAttribute('r', r);
+    ring.setAttribute('opacity', Math.max(0, op));
+    if (op > 0) requestAnimationFrame(animate);
+    else ring.remove();
+  };
+  requestAnimationFrame(animate);
+
+  setTimeout(() => circle.remove(), 3000);
+}
+
+// ATTACK GENERATION (AI + QUANTUM)
+function generateAttack() {
+  const isQuantum = Math.random() < 0.18; // ~18% are quantum/PQC themed
+  const attack = isQuantum ? rand(QUANTUM_ATTACKS) : rand(AI_ATTACKS);
+  const src = rand(CITIES);
+  let dst = rand(CITIES);
+  while (dst === src) dst = rand(CITIES);
+
+  const entry = {
+    ...attack,
+    src, dst,
+    time: timestamp(),
+    ip_src: genIP(),
+    ip_dst: genIP(),
+    id: Date.now() + Math.random(),
+    isQuantum
+  };
+
+  state.totalAttacks++;
+  if (!isQuantum && (attack.category === 'ai-assisted' || attack.atlas)) state.aiAssisted++;
+  if (attack.severity === 'critical') state.critCount++;
+  if (attack.severity === 'high') state.highCount++;
+  if (attack.category === 'model-attack') state.modelAttacks++;
+  if (attack.type.includes('Prompt')) state.promptInj++;
+
+  const quantumBucket = "Quantum/PQC";
+  const atlasKey = ATLAS_TECHNIQUES.find(t =>
+    attack.type.toLowerCase().includes(t.toLowerCase().split(' ')[0].toLowerCase())
+  ) || (isQuantum ? quantumBucket : rand(ATLAS_TECHNIQUES));
+  state.atlasHeat[atlasKey] += randInt(1, 5);
+
+  rand(TARGET_MODELS).attacks++;
+
+  createAttackArc(src, dst, attack.severity, isQuantum);
+  addAttackToFeed(entry);
+  if (Math.random() > 0.3) setTimeout(() => generateAgentLog(entry), randInt(200, 1200));
+
+  updateStats();
+}
+
+function addAttackToFeed(entry) {
+  const f = state.filter;
+  if (f !== 'all') {
+    if (f === 'critical' && entry.severity !== 'critical') return;
+    if (f === 'ai-assisted' && entry.category !== 'ai-assisted') return;
+    if (f === 'model-attack' && entry.category !== 'model-attack') return;
+    if (f === 'agent' && entry.category !== 'agent') return;
+    if (f === 'quantum' && !entry.isQuantum) return;
+  }
+
+  const feed = document.getElementById('attackFeed');
+  const div = document.createElement('div');
+  div.className = `attack-entry ${entry.severity}`;
+
+  const tags = [];
+  if (entry.mitre) tags.push(`<span class="attack-tag tag-mitre">${entry.mitre}</span>`);
+  if (entry.atlas) tags.push(`<span class="attack-tag tag-atlas">ATLAS</span>`);
+  if (entry.category === 'ai-assisted') tags.push(`<span class="attack-tag tag-ai">AI-ASSISTED</span>`);
+  if (entry.category === 'agent') tags.push(`<span class="attack-tag tag-agent">AGENT-LEVEL</span>`);
+  if (entry.category === 'quantum' || entry.isQuantum) tags.push(`<span class="attack-tag tag-quantum">QUANTUM/PQC</span>`);
+
+  div.innerHTML = `
+    <div class="attack-header">
+      <span class="attack-type">${entry.isQuantum ? '🛰' : '⚡'} ${entry.type}</span>
+      <span class="attack-time">${entry.time}</span>
+    </div>
+    <div class="attack-route">
+      <span>${entry.src.name}, ${entry.src.country}</span> → <span>${entry.dst.name}, ${entry.dst.country}</span>
+    </div>
+    <div class="attack-detail">${entry.desc}</div>
+    <div class="attack-detail" style="margin-top:2px;color:rgba(0,240,255,0.5)">
+      ${entry.ip_src} → ${entry.ip_dst}
+    </div>
+    <div class="attack-tags">${tags.join('')}</div>
+  `;
+
+  feed.insertBefore(div, feed.firstChild);
+  while (feed.children.length > 50) feed.removeChild(feed.lastChild);
+}
+
+function generateAgentLog(attack) {
+  const agent = rand(AGENTS);
+  let action = rand(AGENT_ACTIONS);
+  action = action.replace('{type}', attack.type)
+                 .replace('{src}', attack.src.name)
+                 .replace('{dst}', attack.dst.name)
+                 .replace('{mitre}', attack.mitre || 'T0000');
+
+  const logs = document.getElementById('agentLogs');
+  const div = document.createElement('div');
+  div.className = 'agent-log';
+  div.style.borderLeftColor = agent.color;
+
+  const isWarning = attack.severity === 'critical';
+
+  div.innerHTML = `
+    <span class="agent-name" style="color:${agent.color}">[${agent.name}]</span>
+    <span class="agent-action"> ${action}</span>
+    ${isWarning
+      ? '<br><span class="agent-warning">⚠ ELEVATED — Escalating to quantum-aware threat chain analysis</span>'
+      : '<br><span class="agent-result">✓ Defense protocol executed by Red Team ATOM</span>'}
+  `;
+
+  logs.insertBefore(div, logs.firstChild);
+  while (logs.children.length > 40) logs.removeChild(logs.lastChild);
+}
+
+// FILTER
+function setFilter(f) {
+  state.filter = f;
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    const t = btn.textContent.toLowerCase();
+    btn.classList.toggle('active',
+      (f === 'all' && t === 'all') ||
+      (f === 'critical' && t === 'critical') ||
+      (f === 'ai-assisted' && t === 'ai-assisted') ||
+      (f === 'model-attack' && t === 'model attack') ||
+      (f === 'agent' && t === 'agent-level') ||
+      (f === 'quantum' && t === 'quantum')
+    );
+  });
+  document.getElementById('attackFeed').innerHTML = '';
+}
+
+// STATS / MODELS / HEATMAP
+function updateStats() {
+  document.getElementById('totalAttacks').textContent = state.totalAttacks.toLocaleString();
+  document.getElementById('aiAssisted').textContent = state.aiAssisted.toLocaleString();
+  document.getElementById('agentsActive').textContent = state.agentsActive;
+  document.getElementById('modelsScanned').textContent = state.modelsScanned;
+  document.getElementById('critCount').textContent = state.critCount;
+  document.getElementById('highCount').textContent = state.highCount;
+  document.getElementById('modelAttacks').textContent = state.modelAttacks;
+  document.getElementById('promptInj').textContent = state.promptInj;
+
+  const sorted = [...TARGET_MODELS].sort((a,b) => b.attacks - a.attacks);
+  const modelsDiv = document.getElementById('targetedModels');
+  modelsDiv.innerHTML = sorted.slice(0, 5).map(m => `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;font-family:'JetBrains Mono',monospace;">
+      <span style="color:${m.color};font-size:9px;">● ${m.name}</span>
+      <span style="color:var(--text-secondary);font-size:9px;">${m.attacks} hits</span>
+    </div>
+  `).join('');
+}
+
+function renderHeatmap() {
+  const container = document.getElementById('atlasHeatmap');
+  container.innerHTML = '';
+
+  const maxVal = Math.max(...Object.values(state.atlasHeat));
+
+  ATLAS_TECHNIQUES.forEach(tech => {
+    const val = state.atlasHeat[tech];
+    const pct = (val / maxVal) * 100;
+    const hue = tech === "Quantum/PQC"
+      ? 190
+      : 120 - (pct / 100) * 120;
+
+    const col = document.createElement('div');
+    col.className = 'heatmap-col';
+    col.innerHTML = `
+      <div class="heatmap-bar" style="height:${Math.max(8, pct * 0.7)}px;background:hsl(${hue},80%,50%);box-shadow:0 0 6px hsla(${hue},80%,50%,0.4);"></div>
+      <div class="heatmap-label">${tech}</div>
+    `;
+    col.title = `${tech}: ${val} events`;
+    container.appendChild(col);
+  });
+}
+
+// ECOSYSTEM: Red Team ATOM + PQC
+function updateEcosystem() {
+  const signals = randInt(900, 1600);
+  document.getElementById('atomStatus').textContent = `Simulating ${signals} attack signals/s`;
+
+  const pqcStates = [
+    "Lattice KEM: ACTIVE · Hybrid TLS",
+    "XMSS: ROTATING SIGNATURE KEYS",
+    "NIST PQC PROFILE: ENABLED",
+    "HARVEST-NOW-DECRYPT-LATER RESILIENT"
+  ];
+  document.getElementById('pqcStatus').textContent = pqcStates[randInt(0, pqcStates.length - 1)];
+
+  state.modelsScanned += randInt(2, 7);
+}
+
+// DATETIME
+function updateDateTime() {
+  const d = new Date();
+  document.getElementById('datetime').innerHTML =
+    d.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric', year:'numeric'}) +
+    '<br>' + d.toLocaleTimeString('en-US', {hour12:false}) + ' EST';
+}
+
+// THREAT LEVEL
+function updateThreatLevel() {
+  const levels = [
+    {name: 'CRITICAL', color: '#ff3344'},
+    {name: 'ELEVATED', color: '#ff8800'},
+    {name: 'GUARDED', color: '#ffdd00'},
+  ];
+  const level = state.critCount > 30 ? levels[0] : state.critCount > 15 ? levels[1] : levels[2];
+  const el = document.getElementById('threatLevel');
+  el.textContent = level.name;
+  el.style.color = level.color;
+}
+
+// INIT
+function init() {
+  drawMap();
+  updateDateTime();
+  updateStats();
+  renderHeatmap();
+  updateEcosystem();
+
+  (function scheduleAttack() {
+    generateAttack();
+    const delay = randInt(400, 2200);
+    setTimeout(scheduleAttack, delay);
+  })();
+
+  setInterval(() => {
+    const burst = randInt(3, 8);
+    for (let i = 0; i < burst; i++) setTimeout(generateAttack, i * 150);
+  }, randInt(8000, 15000));
+
+  setInterval(renderHeatmap, 3000);
+  setInterval(updateEcosystem, 4000);
+  setInterval(updateDateTime, 1000);
+  setInterval(updateThreatLevel, 5000);
+}
+
+init();
+</script>
+</body>
+</html>
