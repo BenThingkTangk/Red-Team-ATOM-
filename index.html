@@ -5,771 +5,518 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Red Team ATOM — Global AI Threat Range</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
 
 :root {
-  --bg-primary: #06080e;
-  --bg-secondary: #0a0f1a;
-  --bg-panel: rgba(8, 12, 22, 0.82);
-  --bg-card: rgba(12, 18, 32, 0.6);
-  --accent-cyan: #00f0ff;
-  --accent-magenta: #ff00aa;
-  --accent-red: #ff3344;
-  --accent-orange: #ff8800;
-  --accent-green: #00ff88;
-  --accent-yellow: #ffdd00;
-  --accent-purple: #8855ff;
-  --text-primary: #e8ecf4;
-  --text-secondary: #5a6b82;
-  --text-muted: #3a4558;
-  --border-color: rgba(0, 240, 255, 0.08);
-  --border-glow: rgba(0, 240, 255, 0.18);
-  --glow-cyan: 0 0 30px rgba(0, 240, 255, 0.15);
-  --glow-red: 0 0 20px rgba(255, 51, 68, 0.3);
-  --panel-radius: 12px;
-  --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --bg-void: #010206;
+  --bg-panel: rgba(3, 6, 14, 0.78);
+  --bg-card: rgba(6, 12, 24, 0.5);
+  --bg-card-hover: rgba(10, 18, 36, 0.65);
+  --cyan: #00e8ff;
+  --magenta: #ff00aa;
+  --red: #ff2d3b;
+  --orange: #ff7700;
+  --green: #00ff88;
+  --yellow: #ffd600;
+  --purple: #7744ff;
+  --text-1: #e4e8f0;
+  --text-2: #5a6d88;
+  --text-3: #263044;
+  --border: rgba(0, 232, 255, 0.05);
+  --border-hover: rgba(0, 232, 255, 0.12);
+  --radius: 10px;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg-void);
+  color: var(--text-1);
+  font-family: 'Inter', system-ui, sans-serif;
   overflow: hidden;
-  height: 100vh;
-  width: 100vw;
+  height: 100vh; width: 100vw;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* HEADER */
-.header {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  background: rgba(6, 8, 14, 0.7);
-  border-bottom: 1px solid var(--border-color);
-  padding: 0 24px;
-  height: 52px;
-  display: flex; align-items: center; justify-content: space-between;
-  backdrop-filter: blur(24px) saturate(1.4);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
-}
-
-.header-left {
-  display: flex; align-items: center; gap: 14px;
-}
-
-.logo-mark {
-  width: 32px; height: 32px;
-  position: relative;
-  display: flex; align-items: center; justify-content: center;
-}
-.logo-mark svg {
-  width: 32px; height: 32px;
-}
-
-.brand-text {
-  display: flex; flex-direction: column; gap: 1px;
-}
-.brand-name {
-  font-family: 'Orbitron', monospace;
-  font-weight: 900;
-  font-size: 13px;
-  letter-spacing: 3px;
-  background: linear-gradient(90deg, #fff 0%, var(--accent-cyan) 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
-.brand-sub {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  color: var(--text-muted);
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-}
-
-.header-center {
-  display: flex; align-items: center; gap: 20px;
-}
-
-.threat-level-badge {
-  display: flex; align-items: center; gap: 7px;
-  background: rgba(255,51,68,0.06);
-  border: 1px solid rgba(255,51,68,0.2);
-  border-radius: 20px;
-  padding: 5px 14px;
-  transition: all 0.5s var(--transition-smooth);
-}
-.threat-level-badge:hover {
-  background: rgba(255,51,68,0.12);
-  border-color: rgba(255,51,68,0.4);
-}
-.threat-dot {
-  width: 7px; height: 7px;
-  background: var(--accent-red);
-  border-radius: 50%;
-  animation: pulse-dot 2s ease-in-out infinite;
-  box-shadow: 0 0 8px rgba(255,51,68,0.6);
-}
-@keyframes pulse-dot {
-  0%,100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.8); }
-}
-.threat-label {
-  font-family: 'Orbitron', monospace;
-  font-size: 9px; font-weight: 700;
-  color: var(--accent-red);
-  letter-spacing: 2px;
-}
-
-.stat-chips {
-  display: flex; gap: 20px;
-}
-.stat-chip {
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-}
-.stat-val {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 15px; font-weight: 600;
-  color: var(--accent-cyan);
-  letter-spacing: 0.5px;
-}
-.stat-label {
-  font-size: 7px; letter-spacing: 1.5px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  font-weight: 500;
-}
-
-.header-right {
-  display: flex; align-items: center; gap: 14px;
-}
-.eco-badge {
-  font-family: 'Orbitron', monospace;
-  font-size: 8px; font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 6px;
-  letter-spacing: 2px;
-}
-.eco-atom {
-  background: rgba(0,240,255,0.08);
-  border: 1px solid rgba(0,240,255,0.2);
-  color: var(--accent-cyan);
-}
-
-.datetime {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  color: var(--text-secondary);
-  text-align: right;
-  line-height: 1.5;
-  letter-spacing: 0.5px;
-}
-
-/* GLOBE CONTAINER */
-.globe-container {
-  position: absolute;
-  top: 52px; left: 0; right: 0; bottom: 0;
-  overflow: hidden;
-  background: radial-gradient(ellipse at 50% 50%, #0a1628 0%, #040610 70%);
-}
-
-/* Ambient glow behind globe */
-.globe-container::before {
-  content: '';
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 50vw; height: 50vw;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(0,240,255,0.04) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* PANELS */
-.panel {
-  position: absolute;
-  background: var(--bg-panel);
-  border: 1px solid var(--border-color);
-  backdrop-filter: blur(20px) saturate(1.3);
-  -webkit-backdrop-filter: blur(20px) saturate(1.3);
-  border-radius: var(--panel-radius);
-  overflow: hidden;
-  z-index: 10;
-  transition: border-color 0.4s ease;
-}
-.panel:hover {
-  border-color: var(--border-glow);
-}
-
-.panel-header {
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--border-color);
-  display: flex; align-items: center; justify-content: space-between;
-  background: rgba(0,0,0,0.15);
-}
-.panel-title {
-  font-family: 'Orbitron', monospace;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: var(--accent-cyan);
-  display: flex; align-items: center; gap: 8px;
-}
-.panel-title .icon {
-  font-size: 12px;
-  opacity: 0.8;
-}
-.panel-indicator {
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: var(--accent-green);
-  box-shadow: 0 0 6px rgba(0,255,136,0.5);
-  animation: pulse-dot 2.5s ease-in-out infinite;
-}
-
-/* LEFT PANEL */
-.panel-left {
-  top: 62px; left: 12px; width: 310px; bottom: 12px;
-}
-.attack-feed {
-  padding: 6px 8px;
-  overflow-y: auto;
-  max-height: calc(100vh - 200px);
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0,240,255,0.2) transparent;
-}
-.attack-feed::-webkit-scrollbar { width: 3px; }
-.attack-feed::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.25); border-radius: 3px; }
-.attack-feed::-webkit-scrollbar-track { background: transparent; }
-
-.attack-entry {
-  padding: 10px 12px;
-  margin-bottom: 4px;
-  border-radius: 8px;
-  border-left: 3px solid;
-  background: var(--bg-card);
-  animation: slideIn 0.35s var(--transition-smooth);
-  font-size: 11px;
-  transition: all 0.25s ease;
-  cursor: default;
-}
-.attack-entry:hover {
-  background: rgba(0, 240, 255, 0.04);
-  transform: translateX(2px);
-}
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(-12px) scale(0.98); }
-  to { opacity: 1; transform: translateX(0) scale(1); }
-}
-
-.attack-entry.critical { border-color: var(--accent-red); }
-.attack-entry.high { border-color: var(--accent-orange); }
-.attack-entry.medium { border-color: var(--accent-yellow); }
-.attack-entry.low { border-color: var(--accent-green); }
-
-.attack-header {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 5px;
-}
-.attack-type {
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 600;
-  font-size: 10px;
-}
-.attack-entry.critical .attack-type { color: var(--accent-red); }
-.attack-entry.high .attack-type { color: var(--accent-orange); }
-.attack-entry.medium .attack-type { color: var(--accent-yellow); }
-.attack-entry.low .attack-type { color: var(--accent-green); }
-
-.attack-time {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  color: var(--text-muted);
-  letter-spacing: 0.5px;
-}
-.attack-route {
-  font-size: 10px;
-  color: var(--text-secondary);
-  margin-bottom: 4px;
-}
-.attack-route span { color: var(--text-primary); font-weight: 500; }
-.attack-detail {
-  font-size: 9px;
-  color: var(--text-secondary);
-  font-family: 'JetBrains Mono', monospace;
-  line-height: 1.5;
-  opacity: 0.8;
-}
-.attack-tags {
-  display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap;
-}
-.attack-tag {
-  font-size: 7px;
-  padding: 2px 7px;
-  border-radius: 4px;
-  font-family: 'JetBrains Mono', monospace;
-  letter-spacing: 0.5px;
-  font-weight: 500;
-}
-.tag-mitre { background: rgba(136,85,255,0.12); color: var(--accent-purple); border: 1px solid rgba(136,85,255,0.15); }
-.tag-atlas { background: rgba(0,240,255,0.08); color: var(--accent-cyan); border: 1px solid rgba(0,240,255,0.12); }
-.tag-ai { background: rgba(255,0,170,0.08); color: var(--accent-magenta); border: 1px solid rgba(255,0,170,0.12); }
-.tag-agent { background: rgba(0,255,136,0.08); color: var(--accent-green); border: 1px solid rgba(0,255,136,0.12); }
-.tag-quantum { background: rgba(0,240,255,0.08); color: var(--accent-cyan); border: 1px solid rgba(0,240,255,0.12); }
-
-/* RIGHT PANEL */
-.panel-right {
-  top: 62px; right: 12px; width: 310px; bottom: 12px;
-  display: flex; flex-direction: column;
-}
-
-.analytics-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  padding: 10px;
-}
-.analytic-card {
-  background: var(--bg-card);
-  border-radius: 8px;
-  padding: 10px 12px;
-  text-align: center;
-  border: 1px solid rgba(255,255,255,0.03);
-  transition: all 0.3s ease;
-  position: relative;
+/* ═══ STAR FIELD ═══ */
+.starfield {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
   overflow: hidden;
 }
-.analytic-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0,240,255,0.2), transparent);
-  opacity: 0;
-  transition: opacity 0.3s;
+.starfield canvas { width: 100%; height: 100%; }
+
+/* ═══ NEBULA GLOW ═══ */
+.nebula {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    radial-gradient(ellipse 40% 35% at 50% 48%, rgba(0,60,180,0.06) 0%, transparent 100%),
+    radial-gradient(ellipse 30% 25% at 55% 45%, rgba(0,232,255,0.03) 0%, transparent 100%),
+    radial-gradient(ellipse 25% 20% at 45% 52%, rgba(120,0,200,0.02) 0%, transparent 100%);
+  animation: nebulaShift 20s ease-in-out infinite alternate;
 }
-.analytic-card:hover::before { opacity: 1; }
-.analytic-card:hover {
-  border-color: rgba(255,255,255,0.06);
-  background: rgba(12, 18, 32, 0.8);
-}
-.analytic-card .val {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-}
-.analytic-card .label {
-  font-size: 7px;
-  letter-spacing: 1.5px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  margin-top: 4px;
-  font-weight: 600;
+@keyframes nebulaShift {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
 }
 
-.endpoints-section { padding: 0; }
-.endpoint-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 5px 16px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  transition: background 0.2s;
-}
-.endpoint-row:hover { background: rgba(0,240,255,0.02); }
-.endpoint-name { display: flex; align-items: center; gap: 6px; }
-.endpoint-dot {
-  width: 4px; height: 4px;
-  border-radius: 50%;
-}
-.endpoint-hits { color: var(--text-muted); }
-
-.agent-log-section {
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-.agent-log-section .panel-header {
-  border-top: 1px solid var(--border-color);
-}
-
-.agent-logs {
-  padding: 6px 8px;
-  overflow-y: auto;
-  flex: 1;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,0,170,0.2) transparent;
-}
-.agent-logs::-webkit-scrollbar { width: 3px; }
-.agent-logs::-webkit-scrollbar-thumb { background: rgba(255,0,170,0.25); border-radius: 3px; }
-
-.agent-log {
-  padding: 7px 10px;
-  margin-bottom: 3px;
-  border-radius: 6px;
-  background: var(--bg-card);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8.5px;
-  line-height: 1.6;
-  animation: slideIn 0.3s var(--transition-smooth);
-  border-left: 2px solid var(--accent-magenta);
-  transition: background 0.2s;
-}
-.agent-log:hover { background: rgba(255,0,170,0.03); }
-.agent-name { font-weight: 600; }
-.agent-action { color: var(--text-secondary); }
-.agent-result { color: var(--accent-green); opacity: 0.8; }
-.agent-warning { color: var(--accent-orange); opacity: 0.9; }
-
-/* BOTTOM PANEL */
-.panel-bottom {
-  position: absolute;
-  bottom: 12px;
-  left: 332px;
-  right: 332px;
-  height: 115px;
-  background: var(--bg-panel);
-  border: 1px solid var(--border-color);
-  backdrop-filter: blur(20px) saturate(1.3);
-  -webkit-backdrop-filter: blur(20px) saturate(1.3);
-  border-radius: var(--panel-radius);
-  display: flex;
-  flex-direction: column;
-  z-index: 10;
-  transition: border-color 0.4s ease;
-}
-.panel-bottom:hover {
-  border-color: var(--border-glow);
-}
-
-.heatmap-container {
-  display: flex;
-  padding: 4px 12px 6px;
-  gap: 4px;
-  flex: 1;
-  align-items: flex-end;
-}
-.heatmap-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  cursor: default;
-}
-.heatmap-col:hover .heatmap-bar { filter: brightness(1.3); }
-.heatmap-bar {
-  width: 100%;
-  border-radius: 3px 3px 1px 1px;
-  min-height: 4px;
-  transition: height 0.6s var(--transition-smooth), background 0.5s ease, filter 0.2s;
-}
-.heatmap-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 6.5px;
-  color: var(--text-muted);
-  text-align: center;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  transform: rotate(180deg);
-  max-height: 50px;
-  overflow: hidden;
-  letter-spacing: 0.3px;
-}
-
-/* ECO STRIP */
-.eco-strip {
-  position: absolute;
-  top: 62px;
-  left: 332px;
-  right: 332px;
-  display: flex;
-  gap: 8px;
-  z-index: 10;
-}
-.eco-module {
-  flex: 1;
-  background: var(--bg-panel);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 8px 14px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  transition: all 0.3s ease;
-}
-.eco-module:hover {
-  border-color: var(--border-glow);
-  background: rgba(8, 12, 22, 0.9);
-}
-.eco-icon {
-  width: 28px; height: 28px;
-  border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px;
-  flex-shrink: 0;
-}
-.eco-icon.atom-bg { background: linear-gradient(135deg, rgba(0,240,255,0.15), rgba(0,240,255,0.03)); }
-.eco-icon.pqc-bg { background: linear-gradient(135deg, rgba(255,136,0,0.15), rgba(255,136,0,0.03)); }
-.eco-module-info { display: flex; flex-direction: column; gap: 2px; }
-.eco-module-name {
-  font-family: 'Orbitron', monospace;
-  font-size: 8px; font-weight: 700;
-  letter-spacing: 1.5px;
-}
-.eco-module-status {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 7.5px;
-  color: var(--accent-green);
-  opacity: 0.8;
-}
-
-/* FILTER BAR */
-.filter-bar {
-  padding: 8px 12px;
-  display: flex; gap: 4px; flex-wrap: wrap;
-  border-bottom: 1px solid var(--border-color);
-}
-.filter-btn {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 7.5px;
-  padding: 3px 9px;
-  border-radius: 5px;
-  border: 1px solid rgba(255,255,255,0.06);
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.25s var(--transition-smooth);
-  letter-spacing: 0.5px;
-  font-weight: 500;
-}
-.filter-btn.active {
-  border-color: rgba(0,240,255,0.3);
-  color: var(--accent-cyan);
-  background: rgba(0,240,255,0.06);
-}
-.filter-btn:hover {
-  border-color: rgba(0,240,255,0.2);
-  color: var(--text-primary);
-  background: rgba(0,240,255,0.03);
-}
-
-/* GLOBE TOOLTIP */
-.globe-tooltip {
-  position: fixed;
-  background: rgba(6,8,14,0.92);
-  border: 1px solid rgba(0,240,255,0.2);
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 10px;
-  font-family: 'JetBrains Mono', monospace;
-  max-width: 250px;
-  z-index: 999;
-  pointer-events: none;
-  display: none;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 4px 30px rgba(0,0,0,0.5), 0 0 15px rgba(0,240,255,0.08);
-}
-
-/* SCANLINE */
-.scanline {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  pointer-events: none;
-  z-index: 50;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 240, 255, 0.008) 2px,
-    rgba(0, 240, 255, 0.008) 4px
-  );
+/* ═══ SCANLINES ═══ */
+.scanlines {
+  position: fixed; inset: 0; z-index: 60; pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,232,255,0.005) 2px, rgba(0,232,255,0.005) 4px);
   mix-blend-mode: overlay;
 }
 
-/* CORNER ACCENTS for panels */
-.panel::before {
-  content: '';
-  position: absolute;
-  top: -1px; left: -1px;
-  width: 20px; height: 20px;
-  border-top: 1px solid rgba(0,240,255,0.15);
-  border-left: 1px solid rgba(0,240,255,0.15);
-  border-radius: var(--panel-radius) 0 0 0;
-  pointer-events: none;
-  z-index: 1;
+/* ═══ HEADER ═══ */
+.header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 50px;
+  background: rgba(1, 2, 6, 0.6);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(30px) saturate(1.6);
+  -webkit-backdrop-filter: blur(30px) saturate(1.6);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px;
+  animation: slideDown 0.8s var(--ease) both;
+}
+@keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } }
+
+.header-left { display: flex; align-items: center; gap: 12px; }
+
+/* ═══ ANIMATED LOGO ═══ */
+.logo-wrap { width: 34px; height: 34px; position: relative; }
+.logo-wrap svg { width: 34px; height: 34px; }
+.logo-orbit { animation: orbit 6s linear infinite; transform-origin: 17px 17px; }
+.logo-orbit-2 { animation: orbit 8s linear infinite reverse; transform-origin: 17px 17px; }
+.logo-core { animation: corePulse 3s ease-in-out infinite; transform-origin: 17px 17px; }
+@keyframes orbit { to { transform: rotate(360deg); } }
+@keyframes corePulse { 0%,100% { opacity: 0.8; } 50% { opacity: 1; } }
+
+.brand { display: flex; flex-direction: column; }
+.brand-name {
+  font-family: 'Orbitron', monospace; font-weight: 900; font-size: 13px;
+  letter-spacing: 4px;
+  background: linear-gradient(90deg, #fff 20%, var(--cyan) 80%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.brand-sub {
+  font-family: 'JetBrains Mono', monospace; font-size: 7.5px;
+  color: var(--text-3); letter-spacing: 2.5px;
 }
 
-/* Perplexity Attribution */
-.attribution {
-  position: fixed;
-  bottom: 4px;
-  right: 4px;
-  z-index: 100;
+.header-center { display: flex; align-items: center; gap: 22px; }
+
+.threat-badge {
+  display: flex; align-items: center; gap: 7px;
+  padding: 4px 14px; border-radius: 20px;
+  background: rgba(255,45,59,0.06);
+  border: 1px solid rgba(255,45,59,0.18);
+  transition: all 0.5s ease;
+}
+.threat-pulse {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 10px rgba(255,45,59,0.7);
+  animation: dotPulse 2s ease-in-out infinite;
+}
+@keyframes dotPulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(0.7); opacity: 0.4; } }
+.threat-text {
+  font-family: 'Orbitron', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: 2px; color: var(--red);
+}
+
+.stats { display: flex; gap: 18px; }
+.stat { display: flex; flex-direction: column; align-items: center; }
+.stat-num {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 7px;
-  color: var(--text-muted);
-  opacity: 0.5;
+  font-size: 14px; font-weight: 600; letter-spacing: 0.5px;
 }
-.attribution a {
-  color: var(--text-muted);
-  text-decoration: none;
+.stat-label {
+  font-size: 7px; letter-spacing: 1.5px; font-weight: 600;
+  color: var(--text-3); text-transform: uppercase;
 }
-.attribution a:hover {
-  color: var(--accent-cyan);
+
+.header-right { display: flex; align-items: center; gap: 12px; }
+.badge-atom {
+  font-family: 'Orbitron', monospace; font-size: 7.5px; font-weight: 700;
+  padding: 3px 10px; border-radius: 5px; letter-spacing: 2px;
+  background: rgba(0,232,255,0.06); border: 1px solid rgba(0,232,255,0.15);
+  color: var(--cyan);
 }
+.clock {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  color: var(--text-2); text-align: right; line-height: 1.5;
+}
+
+/* ═══ GLOBE CONTAINER ═══ */
+.globe-wrap {
+  position: absolute; top: 50px; left: 0; right: 0; bottom: 0;
+  overflow: hidden; z-index: 2;
+}
+/* Soft halo behind globe */
+.globe-wrap::before {
+  content: ''; position: absolute; z-index: 1;
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 50vmin; height: 50vmin; border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,100,220,0.08) 0%, rgba(0,232,255,0.03) 40%, transparent 70%);
+  pointer-events: none;
+  animation: halo 8s ease-in-out infinite alternate;
+}
+@keyframes halo { 0% { opacity: 0.5; transform: translate(-50%,-50%) scale(1); } 100% { opacity: 1; transform: translate(-50%,-50%) scale(1.06); } }
+
+/* ═══ PANELS ═══ */
+.panel {
+  position: absolute; z-index: 10;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+.panel:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 0 50px rgba(0,232,255,0.025);
+}
+
+/* Animated shimmer top edge */
+.panel::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0,232,255,0.18) 30%, rgba(255,0,170,0.1) 70%, transparent 100%);
+  z-index: 2;
+  animation: edgeShimmer 6s ease-in-out infinite;
+}
+@keyframes edgeShimmer {
+  0%, 100% { opacity: 0.2; background-position: -200% 0; }
+  50% { opacity: 0.7; background-position: 200% 0; }
+}
+
+.panel-head {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(0,0,0,0.25);
+}
+.panel-label {
+  font-family: 'Orbitron', monospace; font-size: 8.5px; font-weight: 700;
+  letter-spacing: 2px; color: var(--cyan);
+  display: flex; align-items: center; gap: 7px;
+}
+.panel-label .ico { font-size: 11px; opacity: 0.7; }
+.panel-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--green); box-shadow: 0 0 6px rgba(0,255,136,0.5);
+  animation: dotPulse 2.5s ease-in-out infinite;
+}
+
+/* ═══ LEFT PANEL ═══ */
+.panel-left {
+  top: 58px; left: 10px; width: 300px; bottom: 10px;
+  animation: panelLeft 0.6s 0.3s var(--ease) both;
+}
+@keyframes panelLeft { from { transform: translateX(-40px); opacity: 0; } }
+
+.filters {
+  padding: 7px 12px; display: flex; gap: 4px; flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+}
+.fbtn {
+  font-family: 'JetBrains Mono', monospace; font-size: 7px; font-weight: 500;
+  padding: 3px 8px; border-radius: 4px; letter-spacing: 0.5px;
+  border: 1px solid rgba(255,255,255,0.04); background: transparent;
+  color: var(--text-3); cursor: pointer; transition: all 0.2s var(--ease);
+}
+.fbtn.on { border-color: rgba(0,232,255,0.25); color: var(--cyan); background: rgba(0,232,255,0.06); }
+.fbtn:hover { border-color: rgba(0,232,255,0.18); color: var(--text-1); }
+
+.feed {
+  padding: 5px 6px; overflow-y: auto;
+  max-height: calc(100vh - 185px);
+  scrollbar-width: thin; scrollbar-color: rgba(0,232,255,0.12) transparent;
+}
+.feed::-webkit-scrollbar { width: 2px; }
+.feed::-webkit-scrollbar-thumb { background: rgba(0,232,255,0.18); border-radius: 2px; }
+
+.atk {
+  padding: 9px 11px; margin-bottom: 4px; border-radius: 7px;
+  border-left: 3px solid; background: var(--bg-card);
+  animation: atkIn 0.35s var(--ease); cursor: default;
+  transition: all 0.2s ease;
+}
+.atk:hover { background: var(--bg-card-hover); transform: translateX(2px); }
+@keyframes atkIn { from { opacity: 0; transform: translateX(-14px) scale(0.97); } }
+
+.atk.critical { border-color: var(--red); }
+.atk.high { border-color: var(--orange); }
+.atk.medium { border-color: var(--yellow); }
+.atk.low { border-color: var(--green); }
+
+.atk-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.atk-name { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 9.5px; }
+.atk.critical .atk-name { color: var(--red); }
+.atk.high .atk-name { color: var(--orange); }
+.atk.medium .atk-name { color: var(--yellow); }
+.atk.low .atk-name { color: var(--green); }
+
+.atk-time { font-family: 'JetBrains Mono', monospace; font-size: 7.5px; color: var(--text-3); }
+.atk-route { font-size: 9.5px; color: var(--text-2); margin-bottom: 3px; }
+.atk-route b { color: var(--text-1); font-weight: 500; }
+.atk-desc { font-family: 'JetBrains Mono', monospace; font-size: 8.5px; color: var(--text-2); line-height: 1.5; opacity: 0.75; }
+.atk-ips { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: rgba(0,232,255,0.18); margin-top: 2px; }
+.atk-tags { display: flex; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
+.tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 6.5px; font-weight: 600;
+  padding: 2px 6px; border-radius: 3px; letter-spacing: 0.3px;
+}
+.tag-m { background: rgba(119,68,255,0.1); color: var(--purple); border: 1px solid rgba(119,68,255,0.12); }
+.tag-a { background: rgba(0,232,255,0.06); color: var(--cyan); border: 1px solid rgba(0,232,255,0.1); }
+.tag-i { background: rgba(255,0,170,0.06); color: var(--magenta); border: 1px solid rgba(255,0,170,0.1); }
+.tag-g { background: rgba(0,255,136,0.06); color: var(--green); border: 1px solid rgba(0,255,136,0.1); }
+.tag-q { background: rgba(0,232,255,0.06); color: var(--cyan); border: 1px solid rgba(0,232,255,0.1); }
+
+/* ═══ RIGHT PANEL ═══ */
+.panel-right {
+  top: 58px; right: 10px; width: 300px; bottom: 10px;
+  display: flex; flex-direction: column;
+  animation: panelRight 0.6s 0.4s var(--ease) both;
+}
+@keyframes panelRight { from { transform: translateX(40px); opacity: 0; } }
+
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding: 8px; }
+.card {
+  background: var(--bg-card); border-radius: 7px; padding: 10px;
+  text-align: center; border: 1px solid transparent;
+  position: relative; overflow: hidden; transition: all 0.3s ease;
+}
+.card:hover { border-color: rgba(255,255,255,0.04); background: var(--bg-card-hover); }
+.card .v { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+.card .l { font-size: 6.5px; letter-spacing: 1.5px; color: var(--text-3); text-transform: uppercase; margin-top: 3px; font-weight: 700; }
+
+.ep-list { padding: 4px 0; }
+.ep {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 4px 14px; font-family: 'JetBrains Mono', monospace; font-size: 8.5px;
+  transition: background 0.2s;
+}
+.ep:hover { background: rgba(0,232,255,0.015); }
+.ep-name { display: flex; align-items: center; gap: 6px; }
+.ep-dot { width: 4px; height: 4px; border-radius: 50%; }
+.ep-hits { color: var(--text-3); }
+
+.log-section { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.log-section .panel-head { border-top: 1px solid var(--border); }
+.logs {
+  padding: 5px 6px; overflow-y: auto; flex: 1;
+  scrollbar-width: thin; scrollbar-color: rgba(255,0,170,0.12) transparent;
+}
+.logs::-webkit-scrollbar { width: 2px; }
+.logs::-webkit-scrollbar-thumb { background: rgba(255,0,170,0.18); border-radius: 2px; }
+
+.log {
+  padding: 6px 9px; margin-bottom: 3px; border-radius: 5px;
+  background: var(--bg-card); border-left: 2px solid var(--magenta);
+  font-family: 'JetBrains Mono', monospace; font-size: 8px; line-height: 1.6;
+  animation: atkIn 0.3s var(--ease); transition: background 0.2s;
+}
+.log:hover { background: rgba(255,0,170,0.02); }
+.log-agent { font-weight: 600; }
+.log-act { color: var(--text-2); }
+.log-ok { color: var(--green); opacity: 0.75; }
+.log-warn { color: var(--orange); opacity: 0.85; }
+
+/* ═══ BOTTOM PANEL ═══ */
+.panel-bottom {
+  position: absolute; z-index: 10;
+  bottom: 10px; left: 320px; right: 320px; height: 110px;
+  background: var(--bg-panel); border: 1px solid var(--border);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border-radius: var(--radius);
+  display: flex; flex-direction: column;
+  transition: border-color 0.4s ease;
+  animation: panelUp 0.6s 0.5s var(--ease) both;
+}
+.panel-bottom:hover { border-color: var(--border-hover); }
+@keyframes panelUp { from { transform: translateY(30px); opacity: 0; } }
+.panel-bottom::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0,232,255,0.18) 30%, rgba(255,0,170,0.1) 70%, transparent 100%);
+  z-index: 2; animation: edgeShimmer 6s ease-in-out infinite;
+}
+
+.heatmap { display: flex; padding: 4px 10px 6px; gap: 3px; flex: 1; align-items: flex-end; }
+.hm-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: default; }
+.hm-col:hover .hm-bar { filter: brightness(1.4) drop-shadow(0 0 5px currentColor); }
+.hm-bar {
+  width: 100%; border-radius: 3px 3px 1px 1px; min-height: 3px;
+  transition: height 0.6s var(--ease), background 0.5s ease, filter 0.2s;
+}
+.hm-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 6px; color: var(--text-3);
+  writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg);
+  max-height: 48px; overflow: hidden; letter-spacing: 0.2px;
+}
+
+/* ═══ ECO STRIP ═══ */
+.eco-strip {
+  position: absolute; top: 58px; left: 320px; right: 320px;
+  display: flex; gap: 6px; z-index: 10;
+  animation: panelUp 0.5s 0.35s var(--ease) both;
+}
+.eco-mod {
+  flex: 1; display: flex; align-items: center; gap: 9px;
+  background: var(--bg-panel); border: 1px solid var(--border);
+  border-radius: 7px; padding: 7px 12px;
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  transition: all 0.3s ease;
+}
+.eco-mod:hover { border-color: var(--border-hover); }
+.eco-ico {
+  width: 26px; height: 26px; border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0;
+}
+.eco-ico.i-atom { background: linear-gradient(135deg, rgba(0,232,255,0.1), rgba(0,232,255,0.02)); }
+.eco-ico.i-pqc { background: linear-gradient(135deg, rgba(255,119,0,0.1), rgba(255,119,0,0.02)); }
+.eco-info { display: flex; flex-direction: column; gap: 1px; }
+.eco-name { font-family: 'Orbitron', monospace; font-size: 7.5px; font-weight: 700; letter-spacing: 1.5px; }
+.eco-status { font-family: 'JetBrains Mono', monospace; font-size: 7px; color: var(--green); opacity: 0.7; }
+
+::selection { background: rgba(0,232,255,0.2); color: #fff; }
 </style>
 </head>
 <body>
 
-<div class="scanline"></div>
+<div class="starfield"><canvas id="stars"></canvas></div>
+<div class="nebula"></div>
+<div class="scanlines"></div>
 
 <!-- HEADER -->
 <div class="header">
   <div class="header-left">
-    <div class="logo-mark">
-      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="16" cy="16" r="14" stroke="url(#logoGrad)" stroke-width="1.5" opacity="0.6"/>
-        <ellipse cx="16" cy="16" rx="14" ry="6" stroke="url(#logoGrad)" stroke-width="1" opacity="0.4" transform="rotate(60 16 16)"/>
-        <ellipse cx="16" cy="16" rx="14" ry="6" stroke="url(#logoGrad)" stroke-width="1" opacity="0.4" transform="rotate(-60 16 16)"/>
-        <ellipse cx="16" cy="16" rx="14" ry="6" stroke="url(#logoGrad)" stroke-width="1" opacity="0.4"/>
-        <circle cx="16" cy="16" r="3" fill="url(#logoGrad)"/>
+    <div class="logo-wrap">
+      <svg viewBox="0 0 34 34" fill="none">
         <defs>
-          <linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32">
-            <stop stop-color="#00f0ff"/>
-            <stop offset="1" stop-color="#ff00aa"/>
+          <linearGradient id="lg1" x1="0" y1="0" x2="34" y2="34">
+            <stop stop-color="#00e8ff"/><stop offset="1" stop-color="#ff00aa"/>
           </linearGradient>
+          <radialGradient id="rg1" cx="50%" cy="50%" r="50%">
+            <stop stop-color="#00e8ff"/><stop offset="1" stop-color="#00e8ff" stop-opacity="0"/>
+          </radialGradient>
         </defs>
+        <circle cx="17" cy="17" r="15" stroke="url(#lg1)" stroke-width="1" opacity="0.3"/>
+        <g class="logo-orbit">
+          <ellipse cx="17" cy="17" rx="14" ry="5" stroke="url(#lg1)" stroke-width="0.7" opacity="0.5"/>
+          <circle cx="31" cy="17" r="1.8" fill="var(--cyan)" opacity="0.9">
+            <animate attributeName="opacity" values="0.9;0.4;0.9" dur="2s" repeatCount="indefinite"/>
+          </circle>
+        </g>
+        <g class="logo-orbit-2">
+          <ellipse cx="17" cy="17" rx="14" ry="5" stroke="url(#lg1)" stroke-width="0.7" opacity="0.35" transform="rotate(60 17 17)"/>
+        </g>
+        <ellipse cx="17" cy="17" rx="14" ry="5" stroke="url(#lg1)" stroke-width="0.7" opacity="0.35" transform="rotate(-60 17 17)"/>
+        <g class="logo-core">
+          <circle cx="17" cy="17" r="3.5" fill="url(#rg1)" opacity="0.2"/>
+          <circle cx="17" cy="17" r="2" fill="url(#lg1)"/>
+        </g>
       </svg>
     </div>
-    <div class="brand-text">
+    <div class="brand">
       <div class="brand-name">RED TEAM ATOM</div>
       <div class="brand-sub">AUTONOMOUS QUANTUM-READY RED TEAM RANGE</div>
     </div>
   </div>
   <div class="header-center">
-    <div class="threat-level-badge">
-      <div class="threat-dot"></div>
-      <span class="threat-label" id="threatLevel">ELEVATED</span>
+    <div class="threat-badge">
+      <div class="threat-pulse"></div>
+      <span class="threat-text" id="threatLevel">ELEVATED</span>
     </div>
-    <div class="stat-chips">
-      <div class="stat-chip">
-        <span class="stat-val" id="totalAttacks">0</span>
-        <span class="stat-label">Attacks/24h</span>
-      </div>
-      <div class="stat-chip">
-        <span class="stat-val" id="aiAssisted" style="color:var(--accent-magenta)">0</span>
-        <span class="stat-label">AI-Assisted</span>
-      </div>
-      <div class="stat-chip">
-        <span class="stat-val" id="agentsActive" style="color:var(--accent-green)">0</span>
-        <span class="stat-label">Agents Active</span>
-      </div>
-      <div class="stat-chip">
-        <span class="stat-val" id="modelsScanned" style="color:var(--accent-purple)">0</span>
-        <span class="stat-label">Models Scanned</span>
-      </div>
+    <div class="stats">
+      <div class="stat"><span class="stat-num" id="totalAttacks" style="color:var(--cyan)">0</span><span class="stat-label">Attacks/24h</span></div>
+      <div class="stat"><span class="stat-num" id="aiAssisted" style="color:var(--magenta)">0</span><span class="stat-label">AI-Assisted</span></div>
+      <div class="stat"><span class="stat-num" id="agentsActive" style="color:var(--green)">0</span><span class="stat-label">Agents Active</span></div>
+      <div class="stat"><span class="stat-num" id="modelsScanned" style="color:var(--purple)">0</span><span class="stat-label">Models Scanned</span></div>
     </div>
   </div>
   <div class="header-right">
-    <span class="eco-badge eco-atom">ATOM</span>
-    <div class="datetime" id="datetime"></div>
+    <span class="badge-atom">ATOM</span>
+    <div class="clock" id="datetime"></div>
   </div>
 </div>
 
 <!-- ECO STRIP -->
 <div class="eco-strip">
-  <div class="eco-module">
-    <div class="eco-icon atom-bg">⚛️</div>
-    <div class="eco-module-info">
-      <span class="eco-module-name" style="color:var(--accent-cyan)">RED TEAM ATOM</span>
-      <span class="eco-module-status" id="atomStatus">Active adversarial simulation</span>
+  <div class="eco-mod">
+    <div class="eco-ico i-atom">⚛️</div>
+    <div class="eco-info">
+      <span class="eco-name" style="color:var(--cyan)">RED TEAM ATOM</span>
+      <span class="eco-status" id="atomStatus">Live threat detection active</span>
     </div>
   </div>
-  <div class="eco-module">
-    <div class="eco-icon pqc-bg">🔐</div>
-    <div class="eco-module-info">
-      <span class="eco-module-name" style="color:var(--accent-orange)">PQC ENGINE</span>
-      <span class="eco-module-status" id="pqcStatus">Lattice-based key rotation</span>
+  <div class="eco-mod">
+    <div class="eco-ico i-pqc">🔐</div>
+    <div class="eco-info">
+      <span class="eco-name" style="color:var(--orange)">PQC ENGINE</span>
+      <span class="eco-status" id="pqcStatus">Lattice-based key rotation</span>
     </div>
   </div>
 </div>
 
 <!-- GLOBE -->
-<div class="globe-container" id="globeContainer"></div>
+<div class="globe-wrap" id="globeContainer"></div>
 
 <!-- LEFT PANEL -->
 <div class="panel panel-left">
-  <div class="panel-header">
-    <span class="panel-title"><span class="icon">⚡</span> AI & QUANTUM ATTACK TELEMETRY</span>
-    <span class="panel-indicator"></span>
+  <div class="panel-head">
+    <span class="panel-label"><span class="ico">⚡</span> AI & QUANTUM ATTACK TELEMETRY</span>
+    <span class="panel-dot"></span>
   </div>
-  <div class="filter-bar">
-    <button class="filter-btn active" onclick="setFilter('all')">ALL</button>
-    <button class="filter-btn" onclick="setFilter('critical')">CRITICAL</button>
-    <button class="filter-btn" onclick="setFilter('ai-assisted')">AI-ASSISTED</button>
-    <button class="filter-btn" onclick="setFilter('model-attack')">MODEL ATTACK</button>
-    <button class="filter-btn" onclick="setFilter('agent')">AGENT-LEVEL</button>
-    <button class="filter-btn" onclick="setFilter('quantum')">QUANTUM</button>
+  <div class="filters">
+    <button class="fbtn on" onclick="setFilter('all')">ALL</button>
+    <button class="fbtn" onclick="setFilter('critical')">CRITICAL</button>
+    <button class="fbtn" onclick="setFilter('ai-assisted')">AI-ASSISTED</button>
+    <button class="fbtn" onclick="setFilter('model-attack')">MODEL ATTACK</button>
+    <button class="fbtn" onclick="setFilter('agent')">AGENT-LEVEL</button>
+    <button class="fbtn" onclick="setFilter('quantum')">QUANTUM</button>
   </div>
-  <div class="attack-feed" id="attackFeed"></div>
+  <div class="feed" id="attackFeed"></div>
 </div>
 
 <!-- RIGHT PANEL -->
 <div class="panel panel-right">
-  <div class="panel-header">
-    <span class="panel-title"><span class="icon">📊</span> THREAT ANALYTICS</span>
-    <span class="panel-indicator"></span>
+  <div class="panel-head">
+    <span class="panel-label"><span class="ico">📊</span> THREAT ANALYTICS</span>
+    <span class="panel-dot"></span>
   </div>
-  <div class="analytics-grid">
-    <div class="analytic-card">
-      <div class="val" style="color:var(--accent-red)" id="critCount">0</div>
-      <div class="label">Critical</div>
-    </div>
-    <div class="analytic-card">
-      <div class="val" style="color:var(--accent-orange)" id="highCount">0</div>
-      <div class="label">High</div>
-    </div>
-    <div class="analytic-card">
-      <div class="val" style="color:var(--accent-cyan)" id="modelAttacks">0</div>
-      <div class="label">Model Attacks</div>
-    </div>
-    <div class="analytic-card">
-      <div class="val" style="color:var(--accent-magenta)" id="promptInj">0</div>
-      <div class="label">Prompt Inject</div>
-    </div>
+  <div class="cards">
+    <div class="card"><div class="v" style="color:var(--red)" id="critCount">0</div><div class="l">Critical</div></div>
+    <div class="card"><div class="v" style="color:var(--orange)" id="highCount">0</div><div class="l">High</div></div>
+    <div class="card"><div class="v" style="color:var(--cyan)" id="modelAttacks">0</div><div class="l">Model Attacks</div></div>
+    <div class="card"><div class="v" style="color:var(--magenta)" id="promptInj">0</div><div class="l">Prompt Inject</div></div>
   </div>
-
-  <div class="panel-header" style="border-top: 1px solid var(--border-color);">
-    <span class="panel-title"><span class="icon">🎯</span> TOP TARGETED ENDPOINTS</span>
+  <div class="panel-head" style="border-top:1px solid var(--border)">
+    <span class="panel-label"><span class="ico">🎯</span> TOP TARGETED ENDPOINTS</span>
   </div>
-  <div id="targetedModels" class="endpoints-section"></div>
-
-  <div class="agent-log-section">
-    <div class="panel-header">
-      <span class="panel-title" style="color:var(--accent-magenta)"><span class="icon">🤖</span> RED TEAM ATOM DEFENSE LOG</span>
-      <span class="panel-indicator" style="background:var(--accent-magenta);box-shadow:0 0 6px rgba(255,0,170,0.5)"></span>
+  <div id="targetedModels" class="ep-list"></div>
+  <div class="log-section">
+    <div class="panel-head">
+      <span class="panel-label" style="color:var(--magenta)"><span class="ico">🤖</span> RED TEAM ATOM DEFENSE LOG</span>
+      <span class="panel-dot" style="background:var(--magenta);box-shadow:0 0 6px rgba(255,0,170,0.5)"></span>
     </div>
-    <div class="agent-logs" id="agentLogs"></div>
+    <div class="logs" id="agentLogs"></div>
   </div>
 </div>
 
-<!-- BOTTOM: ATLAS HEATMAP -->
+<!-- BOTTOM HEATMAP -->
 <div class="panel-bottom">
-  <div class="panel-header">
-    <span class="panel-title"><span class="icon">🗺️</span> MITRE ATLAS & QUANTUM TECHNIQUE HEATMAP</span>
-    <span style="font-family:'JetBrains Mono';font-size:7px;color:var(--text-muted);letter-spacing:1px">LAST 60 MIN</span>
+  <div class="panel-head">
+    <span class="panel-label"><span class="ico">🗺️</span> MITRE ATLAS & QUANTUM TECHNIQUE HEATMAP</span>
+    <span style="font-family:'JetBrains Mono';font-size:6.5px;color:var(--text-3);letter-spacing:1px">LAST 60 MIN</span>
   </div>
-  <div class="heatmap-container" id="atlasHeatmap"></div>
-</div>
-
-<div class="globe-tooltip" id="tooltip"></div>
-
-<!-- Attribution -->
-<div class="attribution">
-  <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
+  <div class="heatmap" id="atlasHeatmap"></div>
 </div>
 
 <!-- THREE.JS + GLOBE.GL -->
@@ -777,564 +524,366 @@ body {
 <script src="https://unpkg.com/globe.gl@2.35.1/dist/globe.gl.min.js"></script>
 
 <script>
-// ===== GEO CITIES =====
-const CITIES = [
-  {name:"Beijing",country:"CN",lat:39.9,lon:116.4},
-  {name:"Shanghai",country:"CN",lat:31.2,lon:121.5},
-  {name:"Moscow",country:"RU",lat:55.8,lon:37.6},
-  {name:"St Petersburg",country:"RU",lat:59.9,lon:30.3},
-  {name:"Tehran",country:"IR",lat:35.7,lon:51.4},
-  {name:"Pyongyang",country:"KP",lat:39.0,lon:125.8},
-  {name:"Lagos",country:"NG",lat:6.5,lon:3.4},
-  {name:"Mumbai",country:"IN",lat:19.1,lon:72.9},
-  {name:"São Paulo",country:"BR",lat:-23.6,lon:-46.6},
-  {name:"London",country:"GB",lat:51.5,lon:-0.1},
-  {name:"Berlin",country:"DE",lat:52.5,lon:13.4},
-  {name:"Tokyo",country:"JP",lat:35.7,lon:139.7},
-  {name:"Seoul",country:"KR",lat:37.6,lon:127.0},
-  {name:"Singapore",country:"SG",lat:1.3,lon:103.8},
-  {name:"Tel Aviv",country:"IL",lat:32.1,lon:34.8},
-  {name:"Bucharest",country:"RO",lat:44.4,lon:26.1},
-  {name:"Hanoi",country:"VN",lat:21.0,lon:105.9},
-  {name:"Riyadh",country:"SA",lat:24.7,lon:46.7},
-  {name:"Islamabad",country:"PK",lat:33.7,lon:73.1},
-  {name:"Kyiv",country:"UA",lat:50.5,lon:30.5},
-  {name:"New York",country:"US",lat:40.7,lon:-74.0},
-  {name:"San Francisco",country:"US",lat:37.8,lon:-122.4},
-  {name:"Washington DC",country:"US",lat:38.9,lon:-77.0},
-  {name:"Chicago",country:"US",lat:41.9,lon:-87.6},
-  {name:"Toronto",country:"CA",lat:43.7,lon:-79.4},
-  {name:"Sydney",country:"AU",lat:-33.9,lon:151.2},
-  {name:"Paris",country:"FR",lat:48.9,lon:2.4},
-  {name:"Amsterdam",country:"NL",lat:52.4,lon:4.9},
-  {name:"Stockholm",country:"SE",lat:59.3,lon:18.1},
-  {name:"Taipei",country:"TW",lat:25.0,lon:121.5},
-  {name:"Jakarta",country:"ID",lat:-6.2,lon:106.8},
-  {name:"Bangkok",country:"BK",lat:13.8,lon:100.5},
-  {name:"Dubai",country:"AE",lat:25.2,lon:55.3},
-  {name:"Cape Town",country:"ZA",lat:-33.9,lon:18.4},
-  {name:"Mexico City",country:"MX",lat:19.4,lon:-99.1},
-  {name:"Buenos Aires",country:"AR",lat:-34.6,lon:-58.4},
-  {name:"Lima",country:"PE",lat:-12.0,lon:-77.0},
-  {name:"Tallinn",country:"EE",lat:59.4,lon:24.7},
-  {name:"Warsaw",country:"PL",lat:52.2,lon:21.0},
-  {name:"Helsinki",country:"FI",lat:60.2,lon:24.9}
+// ══════════ STARFIELD ══════════
+(function initStars(){
+  const c=document.getElementById('stars');
+  const ctx=c.getContext('2d');
+  let w,h,stars=[];
+
+  function resize(){ w=c.width=window.innerWidth; h=c.height=window.innerHeight; }
+  window.addEventListener('resize',resize); resize();
+
+  // Generate stars
+  for(let i=0;i<900;i++){
+    stars.push({
+      x:Math.random()*2000-500, y:Math.random()*2000-500,
+      z:Math.random()*1500+200,
+      o:Math.random()*0.6+0.1,
+      s:Math.random()*1.2+0.3,
+      twinkle:Math.random()*Math.PI*2,
+      twinkleSpeed:0.005+Math.random()*0.02,
+    });
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    const cx=w/2, cy=h/2;
+    for(const s of stars){
+      // Project
+      const scale=400/s.z;
+      const sx=cx+(s.x-cx*0.5)*scale;
+      const sy=cy+(s.y-cy*0.5)*scale;
+      if(sx<-10||sx>w+10||sy<-10||sy>h+10)continue;
+
+      // Twinkle
+      s.twinkle+=s.twinkleSpeed;
+      const flicker=0.5+0.5*Math.sin(s.twinkle);
+      const alpha=s.o*flicker;
+      const r=s.s*scale;
+
+      // Color tint — mostly white, some blue/cyan
+      const tint=s.x%3<1?'200,220,255':s.x%5<1?'180,240,255':'255,255,255';
+
+      ctx.beginPath();
+      ctx.arc(sx,sy,Math.max(0.3,r),0,Math.PI*2);
+      ctx.fillStyle=`rgba(${tint},${alpha})`;
+      ctx.fill();
+
+      // Brighter stars get a glow
+      if(r>0.8&&alpha>0.3){
+        ctx.beginPath();
+        ctx.arc(sx,sy,r*2.5,0,Math.PI*2);
+        ctx.fillStyle=`rgba(${tint},${alpha*0.15})`;
+        ctx.fill();
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ══════════ DATA ══════════
+const CITIES=[{name:"Beijing",country:"CN",lat:39.9,lon:116.4},{name:"Shanghai",country:"CN",lat:31.2,lon:121.5},{name:"Moscow",country:"RU",lat:55.8,lon:37.6},{name:"St Petersburg",country:"RU",lat:59.9,lon:30.3},{name:"Tehran",country:"IR",lat:35.7,lon:51.4},{name:"Pyongyang",country:"KP",lat:39.0,lon:125.8},{name:"Lagos",country:"NG",lat:6.5,lon:3.4},{name:"Mumbai",country:"IN",lat:19.1,lon:72.9},{name:"São Paulo",country:"BR",lat:-23.6,lon:-46.6},{name:"London",country:"GB",lat:51.5,lon:-0.1},{name:"Berlin",country:"DE",lat:52.5,lon:13.4},{name:"Tokyo",country:"JP",lat:35.7,lon:139.7},{name:"Seoul",country:"KR",lat:37.6,lon:127.0},{name:"Singapore",country:"SG",lat:1.3,lon:103.8},{name:"Tel Aviv",country:"IL",lat:32.1,lon:34.8},{name:"Bucharest",country:"RO",lat:44.4,lon:26.1},{name:"Hanoi",country:"VN",lat:21.0,lon:105.9},{name:"Riyadh",country:"SA",lat:24.7,lon:46.7},{name:"Islamabad",country:"PK",lat:33.7,lon:73.1},{name:"Kyiv",country:"UA",lat:50.5,lon:30.5},{name:"New York",country:"US",lat:40.7,lon:-74.0},{name:"San Francisco",country:"US",lat:37.8,lon:-122.4},{name:"Washington DC",country:"US",lat:38.9,lon:-77.0},{name:"Chicago",country:"US",lat:41.9,lon:-87.6},{name:"Toronto",country:"CA",lat:43.7,lon:-79.4},{name:"Sydney",country:"AU",lat:-33.9,lon:151.2},{name:"Paris",country:"FR",lat:48.9,lon:2.4},{name:"Amsterdam",country:"NL",lat:52.4,lon:4.9},{name:"Stockholm",country:"SE",lat:59.3,lon:18.1},{name:"Taipei",country:"TW",lat:25.0,lon:121.5},{name:"Jakarta",country:"ID",lat:-6.2,lon:106.8},{name:"Bangkok",country:"TH",lat:13.8,lon:100.5},{name:"Dubai",country:"AE",lat:25.2,lon:55.3},{name:"Cape Town",country:"ZA",lat:-33.9,lon:18.4},{name:"Mexico City",country:"MX",lat:19.4,lon:-99.1},{name:"Buenos Aires",country:"AR",lat:-34.6,lon:-58.4},{name:"Lima",country:"PE",lat:-12.0,lon:-77.0},{name:"Tallinn",country:"EE",lat:59.4,lon:24.7},{name:"Warsaw",country:"PL",lat:52.2,lon:21.0},{name:"Helsinki",country:"FI",lat:60.2,lon:24.9}];
+
+const AI_ATTACKS=[
+  {type:"Prompt Injection",severity:"critical",category:"ai-assisted",mitre:"AML.T0051",atlas:true,desc:"Multi-stage prompt injection targeting LLM guardrails via nested instruction bypass."},
+  {type:"Model Poisoning",severity:"critical",category:"model-attack",mitre:"AML.T0020",atlas:true,desc:"Training data contamination detected in federated learning pipeline."},
+  {type:"Adversarial Evasion",severity:"high",category:"model-attack",mitre:"AML.T0015",atlas:true,desc:"Adversarial perturbation evading vision model classification boundary."},
+  {type:"Agent Hijacking",severity:"critical",category:"agent",mitre:"AML.T0054",atlas:true,desc:"Autonomous agent tool-use chain redirected via context window manipulation."},
+  {type:"LLM Jailbreak",severity:"high",category:"ai-assisted",mitre:"AML.T0051.001",atlas:true,desc:"Jailbreak attempt against production RAG endpoint."},
+  {type:"Data Exfiltration via AI",severity:"critical",category:"ai-assisted",mitre:"T1041",atlas:false,desc:"Steganographic channel embedding data into model responses."},
+  {type:"Model Theft",severity:"high",category:"model-attack",mitre:"AML.T0044",atlas:true,desc:"API probing to reconstruct proprietary model via distillation."},
+  {type:"Supply Chain - ML Pipeline",severity:"critical",category:"model-attack",mitre:"AML.T0010",atlas:true,desc:"Compromised dependency injecting backdoor triggers during training."},
+  {type:"AI-Powered Phishing",severity:"high",category:"ai-assisted",mitre:"T1566",atlas:false,desc:"AI-generated spear-phishing with real-time persona adaptation."},
+  {type:"Deepfake Social Eng",severity:"high",category:"ai-assisted",mitre:"T1598",atlas:false,desc:"Voice/video deepfake used for executive impersonation."},
+  {type:"RAG Poisoning",severity:"critical",category:"agent",mitre:"AML.T0020.001",atlas:true,desc:"Malicious documents injected into retrieval corpus altering answers."},
+  {type:"Membership Inference",severity:"medium",category:"model-attack",mitre:"AML.T0024",atlas:true,desc:"Privacy attack inferring training data membership via outputs."},
+  {type:"Model Inversion",severity:"high",category:"model-attack",mitre:"AML.T0024.001",atlas:true,desc:"Reconstructing sensitive training data from gradients and outputs."},
+  {type:"Sponge Attack",severity:"medium",category:"model-attack",mitre:"AML.T0029",atlas:true,desc:"Resource exhaustion via inputs maximizing inference compute."},
+  {type:"Backdoor ML Model",severity:"critical",category:"model-attack",mitre:"AML.T0018",atlas:true,desc:"Trojan trigger pattern detected in fine-tuned model checkpoint."},
+  {type:"AI Worm Propagation",severity:"critical",category:"agent",mitre:"AML.T0054.002",atlas:true,desc:"Self-replicating prompts spreading through connected agents."},
+  {type:"Tool-Use Exploit",severity:"high",category:"agent",mitre:"AML.T0054.001",atlas:true,desc:"Agent manipulated into unauthorized system commands via tool chain."},
+  {type:"Context Poisoning",severity:"high",category:"agent",mitre:"AML.T0056",atlas:true,desc:"Long-term memory manipulation altering agent behavior."},
+  {type:"Gradient Leakage",severity:"medium",category:"model-attack",mitre:"AML.T0024.002",atlas:true,desc:"Federated gradient interception exposing private samples."},
+  {type:"AI C2 Channel",severity:"critical",category:"ai-assisted",mitre:"T1071",atlas:false,desc:"LLM-mediated command-and-control using natural language API calls."},
+  {type:"Autonomous Recon",severity:"medium",category:"ai-assisted",mitre:"T1595",atlas:false,desc:"AI agent performing automated reconnaissance & vuln scanning."},
+  {type:"Polymorphic AI Malware",severity:"critical",category:"ai-assisted",mitre:"T1027",atlas:false,desc:"ML-generated polymorphic payload evading signature detection."},
 ];
 
-// ===== AI-SPECIFIC ATTACK TYPES (MITRE ATLAS + Custom) =====
-const AI_ATTACKS = [
-  {type:"Prompt Injection",severity:"critical",category:"ai-assisted",mitre:"AML.T0051",atlas:true,
-   desc:"Multi-stage prompt injection targeting LLM guardrails via nested instruction bypass."},
-  {type:"Model Poisoning",severity:"critical",category:"model-attack",mitre:"AML.T0020",atlas:true,
-   desc:"Training data contamination detected in federated learning pipeline."},
-  {type:"Adversarial Evasion",severity:"high",category:"model-attack",mitre:"AML.T0015",atlas:true,
-   desc:"Adversarial perturbation evading vision model classification boundary."},
-  {type:"Agent Hijacking",severity:"critical",category:"agent",mitre:"AML.T0054",atlas:true,
-   desc:"Autonomous agent tool-use chain redirected via context window manipulation."},
-  {type:"LLM Jailbreak",severity:"high",category:"ai-assisted",mitre:"AML.T0051.001",atlas:true,
-   desc:"Jailbreak attempt against production RAG endpoint."},
-  {type:"Data Exfiltration via AI",severity:"critical",category:"ai-assisted",mitre:"T1041",atlas:false,
-   desc:"Steganographic channel embedding data into model responses."},
-  {type:"Model Theft",severity:"high",category:"model-attack",mitre:"AML.T0044",atlas:true,
-   desc:"API probing to reconstruct proprietary model via distillation."},
-  {type:"Supply Chain - ML Pipeline",severity:"critical",category:"model-attack",mitre:"AML.T0010",atlas:true,
-   desc:"Compromised dependency injecting backdoor triggers during training."},
-  {type:"AI-Powered Phishing",severity:"high",category:"ai-assisted",mitre:"T1566",atlas:false,
-   desc:"AI-generated spear-phishing with real-time persona adaptation."},
-  {type:"Deepfake Social Eng",severity:"high",category:"ai-assisted",mitre:"T1598",atlas:false,
-   desc:"Voice/video deepfake used for executive impersonation."},
-  {type:"RAG Poisoning",severity:"critical",category:"agent",mitre:"AML.T0020.001",atlas:true,
-   desc:"Malicious documents injected into retrieval corpus altering answers."},
-  {type:"Membership Inference",severity:"medium",category:"model-attack",mitre:"AML.T0024",atlas:true,
-   desc:"Privacy attack inferring training data membership via outputs."},
-  {type:"Model Inversion",severity:"high",category:"model-attack",mitre:"AML.T0024.001",atlas:true,
-   desc:"Reconstructing sensitive training data from gradients and outputs."},
-  {type:"Sponge Attack",severity:"medium",category:"model-attack",mitre:"AML.T0029",atlas:true,
-   desc:"Resource exhaustion via inputs maximizing inference compute."},
-  {type:"Backdoor ML Model",severity:"critical",category:"model-attack",mitre:"AML.T0018",atlas:true,
-   desc:"Trojan trigger pattern detected in fine-tuned model checkpoint."},
-  {type:"AI Worm Propagation",severity:"critical",category:"agent",mitre:"AML.T0054.002",atlas:true,
-   desc:"Self-replicating prompts spreading through connected agents."},
-  {type:"Tool-Use Exploit",severity:"high",category:"agent",mitre:"AML.T0054.001",atlas:true,
-   desc:"Agent manipulated into unauthorized system commands via tool chain."},
-  {type:"Context Poisoning",severity:"high",category:"agent",mitre:"AML.T0056",atlas:true,
-   desc:"Long-term memory manipulation altering agent behavior."},
-  {type:"Gradient Leakage",severity:"medium",category:"model-attack",mitre:"AML.T0024.002",atlas:true,
-   desc:"Federated gradient interception exposing private samples."},
-  {type:"AI C2 Channel",severity:"critical",category:"ai-assisted",mitre:"T1071",atlas:false,
-   desc:"LLM-mediated command-and-control using natural language API calls."},
-  {type:"Autonomous Recon",severity:"medium",category:"ai-assisted",mitre:"T1595",atlas:false,
-   desc:"AI agent performing automated reconnaissance & vuln scanning."},
-  {type:"Polymorphic AI Malware",severity:"critical",category:"ai-assisted",mitre:"T1027",atlas:false,
-   desc:"ML-generated polymorphic payload evading signature detection."},
+const QUANTUM_ATTACKS=[
+  {type:"Quantum Key Harvesting",severity:"critical",category:"quantum",mitre:"T1557-Q",atlas:false,desc:"Quantum-accelerated harvest-now-decrypt-later campaign against legacy RSA/ECC."},
+  {type:"Lattice Parameter Downgrade",severity:"high",category:"quantum",mitre:"T1600-Q",atlas:false,desc:"Protocol downgrade forcing migration away from PQC to weaker classical key exchange."},
+  {type:"Hybrid Quantum-AI Deepfake",severity:"high",category:"quantum",mitre:"T1566-Q",atlas:false,desc:"Quantum-boosted model generating ultra-realistic executive deepfake for BEC."},
+  {type:"Quantum ML Evasion",severity:"medium",category:"quantum",mitre:"AML.Q0015",atlas:true,desc:"Adversarial examples tuned against quantum-enhanced anomaly detector."},
+  {type:"PQC Oracle Abuse",severity:"critical",category:"quantum",mitre:"T1203-Q",atlas:false,desc:"Probing PQC key encapsulation as an oracle to infer internal parameters."},
 ];
 
-// QUANTUM / PQC ATTACK TYPES
-const QUANTUM_ATTACKS = [
-  {type:"Quantum-Accelerated Key Harvesting",severity:"critical",category:"quantum",mitre:"T1557-Q",atlas:false,
-   desc:"Adversary using quantum resources to accelerate harvest-now-decrypt-later campaign against legacy RSA/ECC."},
-  {type:"Lattice Parameter Downgrade",severity:"high",category:"quantum",mitre:"T1600-Q",atlas:false,
-   desc:"Protocol downgrade attempt forcing migration away from PQC suite to weaker classical key exchange."},
-  {type:"Hybrid Quantum-AI Deepfake",severity:"high",category:"quantum",mitre:"T1566-Q",atlas:false,
-   desc:"Quantum-boosted model generating ultra-realistic executive deepfake for BEC operations."},
-  {type:"Quantum ML Evasion",severity:"medium",category:"quantum",mitre:"AML.Q0015",atlas:true,
-   desc:"Adversarial examples tuned against quantum-enhanced anomaly detector to evade classification."},
-  {type:"PQC Oracle Abuse",severity:"critical",category:"quantum",mitre:"T1203-Q",atlas:false,
-   desc:"Adversary probing PQC key encapsulation as an oracle to infer internal parameters."},
+const ATLAS_TECHNIQUES=["Prompt Injection","Data Poisoning","Model Evasion","Model Theft","Backdoor ML","Supply Chain ML","Membership Inference","Model Inversion","Agent Hijack","RAG Poisoning","Sponge Attack","Gradient Leak","Context Poison","Tool Exploit","LLM Jailbreak","Quantum/PQC"];
+
+const AGENTS=[
+  {name:"ATOM-Hunter",color:"#00e8ff"},{name:"ATOM-Strike",color:"#ff2d3b"},
+  {name:"ATOM-Alpha",color:"#7744ff"},{name:"ATOM-HVT",color:"#ff7700"},
+  {name:"ATOM-Sigma",color:"#00ff88"},{name:"ATOM-Gamma",color:"#ffd600"},
 ];
 
-const ATLAS_TECHNIQUES = [
-  "Prompt Injection","Data Poisoning","Model Evasion","Model Theft",
-  "Backdoor ML","Supply Chain ML","Membership Inference","Model Inversion",
-  "Agent Hijack","RAG Poisoning","Sponge Attack","Gradient Leak",
-  "Context Poison","Tool Exploit","LLM Jailbreak","Quantum/PQC"
-];
-
-// RED TEAM ATOM AGENTS
-const AGENTS = [
-  {name:"ATOM-Hunter",color:"#00f0ff",role:"Proactive Threat Hunter"},
-  {name:"ATOM-Strike",color:"#ff3344",role:"Active Response Orchestrator"},
-  {name:"ATOM-Alpha",color:"#8855ff",role:"Global Attack Chain Reasoner"},
-  {name:"ATOM-HVT",color:"#ff8800",role:"High-Value Target Guardian"},
-  {name:"ATOM-Sigma",color:"#00ff88",role:"Model Integrity Sentinel"},
-  {name:"ATOM-Gamma",color:"#ffdd00",role:"Quantum Risk Analyzer"},
-];
-
-const AGENT_ACTIONS = [
-  "Intercepted {type} — PQC engine rotated lattice keys in 12.3 ms",
+const AGENT_ACTIONS=[
+  "Intercepted {type} — PQC engine rotated lattice keys in 12.3ms",
   "ATOM defense mesh neutralized {type} before lateral movement",
   "Classified threat vector as {type} with 98.7% confidence",
   "Deployed quantum-safe tunnel for {dst} — legacy cipher deprecated",
   "Correlating {src} → {dst} attack chain with MITRE ATLAS {mitre}",
   "Escalated to HVT watchlist — ATOM-HVT shadowing impacted identities",
-  "Quantum risk score spike detected — rerouting traffic through PQC engine",
-  "Red Team ATOM sandboxed payload for continuous adversarial training",
+  "Quantum risk score spike — rerouting through PQC engine",
+  "Red Team ATOM sandboxed payload for adversarial analysis",
   "LLM honeypot engaged attacker — harvesting quantum-AI TTPs",
-  "Gradient anomaly indicates quantum-accelerated probing — throttling source",
+  "Gradient anomaly → quantum-accelerated probing — throttling source",
   "Backpressure applied at API edge — AI worm propagation halted",
   "PQC ENGINE validated key schedule — no downgrade detected",
   "RAG corpus integrity check: quantum-labeled docs verified clean",
-  "Cross-domain correlation shows {type} blocked at pre-execution stage",
+  "Cross-domain correlation: {type} blocked at pre-execution stage",
 ];
 
-const TARGET_MODELS = [
-  {name:"GPT-4o Endpoint",attacks:0,color:"#ff3344"},
-  {name:"Claude Prod API",attacks:0,color:"#ff8800"},
-  {name:"Gemini Vision",attacks:0,color:"#ffdd00"},
-  {name:"ATOM-Core v3.1",attacks:0,color:"#00f0ff"},
-  {name:"LLaMA-3 Fine-tune",attacks:0,color:"#8855ff"},
+const TARGET_MODELS=[
+  {name:"GPT-4o Endpoint",attacks:0,color:"#ff2d3b"},
+  {name:"Claude Prod API",attacks:0,color:"#ff7700"},
+  {name:"Gemini Vision",attacks:0,color:"#ffd600"},
+  {name:"ATOM-Core v3.1",attacks:0,color:"#00e8ff"},
+  {name:"LLaMA-3 Fine-tune",attacks:0,color:"#7744ff"},
   {name:"PQC Engine",attacks:0,color:"#00ff88"},
   {name:"Mistral-Large",attacks:0,color:"#ff00aa"},
 ];
 
-// ===== STATE =====
-let state = {
-  totalAttacks: 14847,
-  aiAssisted: 3291,
-  agentsActive: 6,
-  modelsScanned: 847,
-  critCount: 0,
-  highCount: 0,
-  modelAttacks: 0,
-  promptInj: 0,
-  atlasHeat: {},
-  filter: 'all',
+// ══════════ STATE ══════════
+let S={
+  totalAttacks:14847, aiAssisted:3291, agentsActive:6, modelsScanned:847,
+  critCount:0, highCount:0, modelAttacks:0, promptInj:0,
+  atlasHeat:{}, filter:'all',
 };
+ATLAS_TECHNIQUES.forEach(t=>S.atlasHeat[t]=Math.floor(Math.random()*40)+5);
 
-ATLAS_TECHNIQUES.forEach(t => state.atlasHeat[t] = Math.floor(Math.random() * 40) + 5);
+// ══════════ UTIL ══════════
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const ts=()=>{const d=new Date();return d.toLocaleTimeString('en-US',{hour12:false})+'.'+String(d.getMilliseconds()).padStart(3,'0');};
+const ip=()=>`${rnd(1,223)}.${rnd(0,255)}.${rnd(0,255)}.${rnd(1,254)}`;
 
-// ===== UTIL =====
-function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-function timestamp() {
-  const d = new Date();
-  return d.toLocaleTimeString('en-US', {hour12:false}) + '.' + String(d.getMilliseconds()).padStart(3,'0');
+function animateNum(el,target){
+  const cur=parseInt(el.textContent.replace(/,/g,''))||0;
+  if(cur===target)return;
+  const diff=target-cur, steps=Math.min(Math.abs(diff),14), inc=diff/steps;
+  let i=0;
+  const tick=()=>{i++;el.textContent=(i>=steps?target:Math.round(cur+inc*i)).toLocaleString();if(i<steps)requestAnimationFrame(tick);};
+  requestAnimationFrame(tick);
 }
-function genIP() {
-  return `${randInt(1,223)}.${randInt(0,255)}.${randInt(0,255)}.${randInt(1,254)}`;
-}
 
-// ===== 3D INTERACTIVE GLOBE =====
-let globe;
-let arcsData = [];
-let ringsData = [];
-let pointsData = [];
+// ══════════ GLOBE ══════════
+let globe, arcsData=[], ringsData=[];
 
-function initGlobe() {
-  const container = document.getElementById('globeContainer');
+function initGlobe(){
+  const el=document.getElementById('globeContainer');
+  const pts=CITIES.map(c=>({lat:c.lat,lng:c.lon,name:c.name,country:c.country,size:0.3,color:'rgba(0,232,255,0.7)'}));
 
-  // City points for the globe
-  pointsData = CITIES.map(c => ({
-    lat: c.lat,
-    lng: c.lon,
-    name: c.name,
-    country: c.country,
-    size: 0.35,
-    color: 'rgba(0, 240, 255, 0.7)'
-  }));
-
-  globe = Globe()
+  globe=Globe()
     .globeImageUrl('https://unpkg.com/three-globe@2.35.1/example/img/earth-night.jpg')
     .bumpImageUrl('https://unpkg.com/three-globe@2.35.1/example/img/earth-topology.png')
     .backgroundImageUrl('')
     .backgroundColor('rgba(0,0,0,0)')
-    .atmosphereColor('#00f0ff')
-    .atmosphereAltitude(0.18)
+    .atmosphereColor('#0088ff')
+    .atmosphereAltitude(0.22)
     .showGraticules(true)
+    .pointsData(pts).pointAltitude('size').pointColor('color').pointRadius(0.22).pointsMerge(true)
+    .arcsData(arcsData).arcColor('color').arcAltitude(d=>d.alt).arcStroke(d=>d.stroke)
+    .arcDashLength(0.5).arcDashGap(0.25).arcDashAnimateTime(d=>d.dashTime).arcsTransitionDuration(0)
+    .ringsData(ringsData).ringColor(d=>t=>`rgba(${d.rgb},${1-t})`)
+    .ringMaxRadius(3.5).ringPropagationSpeed(2).ringRepeatPeriod(1400)
+    (el);
 
-    // Points (cities)
-    .pointsData(pointsData)
-    .pointAltitude('size')
-    .pointColor('color')
-    .pointRadius(0.25)
-    .pointsMerge(true)
-
-    // Arcs (attack lines)
-    .arcsData(arcsData)
-    .arcColor('color')
-    .arcAltitude(d => d.arcAlt)
-    .arcStroke(d => d.stroke)
-    .arcDashLength(0.6)
-    .arcDashGap(0.3)
-    .arcDashAnimateTime(d => d.dashTime)
-    .arcsTransitionDuration(0)
-
-    // Rings (impact pulses)
-    .ringsData(ringsData)
-    .ringColor(d => t => `rgba(${d.rgb},${1 - t})`)
-    .ringMaxRadius(4)
-    .ringPropagationSpeed(2.5)
-    .ringRepeatPeriod(1500)
-    (container);
-
-  // Globe material customization (safe access to THREE)
-  try {
-    const globeMaterial = globe.globeMaterial();
-    globeMaterial.bumpScale = 3;
-    // Access THREE from globe.gl's bundled version
-    const THREE_REF = window.THREE || (globe.scene && globe.scene().constructor && Object.getPrototypeOf(globe.scene()).constructor.prototype.constructor.__proto__);
-    if (window.THREE) {
-      globeMaterial.emissive = new THREE.Color(0x061428);
-      globeMaterial.emissiveIntensity = 0.15;
-      globeMaterial.shininess = 0.7;
-      const scene = globe.scene();
-      const ambientLight = new THREE.AmbientLight(0x1a2a4a, 0.6);
-      scene.add(ambientLight);
+  try{
+    const mat=globe.globeMaterial();
+    mat.bumpScale=3;
+    if(window.THREE){
+      mat.emissive=new THREE.Color(0x030a18);
+      mat.emissiveIntensity=0.1;
+      mat.shininess=0.5;
+      const sc=globe.scene();
+      sc.add(new THREE.AmbientLight(0x0a1a3a,0.4));
+      // Add a subtle directional light for depth
+      const dir=new THREE.DirectionalLight(0x0066cc,0.3);
+      dir.position.set(-1,0.5,1);
+      sc.add(dir);
     }
-  } catch(e) { console.warn('Globe material customization skipped:', e.message); }
+  }catch(e){}
 
-  // Camera positioning
-  globe.pointOfView({ lat: 25, lng: 10, altitude: 2.2 });
+  globe.pointOfView({lat:20,lng:15,altitude:2.1});
+  globe.controls().autoRotate=true;
+  globe.controls().autoRotateSpeed=0.35;
+  globe.controls().enableDamping=true;
+  globe.controls().dampingFactor=0.08;
+  globe.controls().minDistance=110;
+  globe.controls().maxDistance=450;
 
-  // Auto-rotate
-  globe.controls().autoRotate = true;
-  globe.controls().autoRotateSpeed = 0.3;
-  globe.controls().enableDamping = true;
-  globe.controls().dampingFactor = 0.1;
-  globe.controls().minDistance = 120;
-  globe.controls().maxDistance = 500;
-
-  // Responsive
-  function handleResize() {
-    const w = container.clientWidth;
-    const h = container.clientHeight;
-    globe.width(w);
-    globe.height(h);
-  }
-  window.addEventListener('resize', handleResize);
-  handleResize();
+  const resize=()=>{globe.width(el.clientWidth);globe.height(el.clientHeight);};
+  window.addEventListener('resize',resize); resize();
 }
 
-function createGlobeArc(from, to, severity, isQuantum) {
-  const severityColors = {
-    critical: isQuantum ? ['rgba(0,240,255,0.9)', 'rgba(0,240,255,0.3)'] : ['rgba(255,51,68,0.9)', 'rgba(255,51,68,0.3)'],
-    high: isQuantum ? ['rgba(0,191,255,0.8)', 'rgba(0,191,255,0.2)'] : ['rgba(255,136,0,0.8)', 'rgba(255,136,0,0.2)'],
-    medium: isQuantum ? ['rgba(51,255,221,0.7)', 'rgba(51,255,221,0.2)'] : ['rgba(255,221,0,0.7)', 'rgba(255,221,0,0.2)'],
-    low: ['rgba(0,255,136,0.7)', 'rgba(0,255,136,0.2)']
+function fireArc(from,to,severity,isQ){
+  const cmap={
+    critical:isQ?['rgba(0,232,255,0.9)','rgba(0,232,255,0.25)']:['rgba(255,45,59,0.9)','rgba(255,45,59,0.25)'],
+    high:isQ?['rgba(0,180,255,0.8)','rgba(0,180,255,0.2)']:['rgba(255,119,0,0.8)','rgba(255,119,0,0.2)'],
+    medium:isQ?['rgba(50,255,220,0.7)','rgba(50,255,220,0.15)']:['rgba(255,214,0,0.7)','rgba(255,214,0,0.15)'],
+    low:['rgba(0,255,136,0.7)','rgba(0,255,136,0.15)']
   };
-  const colors = severityColors[severity] || severityColors.medium;
-
-  const arc = {
-    startLat: from.lat,
-    startLng: from.lon,
-    endLat: to.lat,
-    endLng: to.lon,
-    color: colors,
-    arcAlt: severity === 'critical' ? 0.25 + Math.random() * 0.15 : 0.1 + Math.random() * 0.1,
-    stroke: severity === 'critical' ? 0.8 : 0.4,
-    dashTime: 1500 + Math.random() * 1000,
-    _ts: Date.now()
+  const arc={
+    startLat:from.lat,startLng:from.lon,endLat:to.lat,endLng:to.lon,
+    color:cmap[severity]||cmap.medium,
+    alt:severity==='critical'?0.2+Math.random()*0.12:0.08+Math.random()*0.08,
+    stroke:severity==='critical'?0.7:0.35,
+    dashTime:1400+Math.random()*800,
   };
-
   arcsData.push(arc);
   globe.arcsData([...arcsData]);
 
-  // Ring at destination
-  const rgbMap = {
-    critical: isQuantum ? '0,240,255' : '255,51,68',
-    high: isQuantum ? '0,191,255' : '255,136,0',
-    medium: isQuantum ? '51,255,221' : '255,221,0',
-    low: '0,255,136'
-  };
-
-  const ring = {
-    lat: to.lat,
-    lng: to.lon,
-    rgb: rgbMap[severity] || '0,240,255',
-    _ts: Date.now()
-  };
+  const rgbMap={critical:isQ?'0,232,255':'255,45,59',high:isQ?'0,180,255':'255,119,0',medium:isQ?'50,255,220':'255,214,0',low:'0,255,136'};
+  const ring={lat:to.lat,lng:to.lon,rgb:rgbMap[severity]||'0,232,255'};
   ringsData.push(ring);
   globe.ringsData([...ringsData]);
 
-  // Remove old arcs/rings after timeout
-  setTimeout(() => {
-    arcsData = arcsData.filter(a => a !== arc);
-    globe.arcsData([...arcsData]);
-  }, 3500);
-
-  setTimeout(() => {
-    ringsData = ringsData.filter(r => r !== ring);
-    globe.ringsData([...ringsData]);
-  }, 4000);
+  setTimeout(()=>{arcsData=arcsData.filter(a=>a!==arc);globe.arcsData([...arcsData]);},3200);
+  setTimeout(()=>{ringsData=ringsData.filter(r=>r!==ring);globe.ringsData([...ringsData]);},3800);
 }
 
-// ===== ATTACK GENERATION =====
-function generateAttack() {
-  const isQuantum = Math.random() < 0.18;
-  const attack = isQuantum ? rand(QUANTUM_ATTACKS) : rand(AI_ATTACKS);
-  const src = rand(CITIES);
-  let dst = rand(CITIES);
-  while (dst === src) dst = rand(CITIES);
+// ══════════ ATTACK ENGINE ══════════
+function genAttack(){
+  const isQ=Math.random()<0.18;
+  const atk=isQ?pick(QUANTUM_ATTACKS):pick(AI_ATTACKS);
+  const src=pick(CITIES); let dst=pick(CITIES); while(dst===src)dst=pick(CITIES);
+  const entry={...atk,src,dst,time:ts(),ip_src:ip(),ip_dst:ip(),id:Date.now()+Math.random(),isQ};
 
-  const entry = {
-    ...attack,
-    src, dst,
-    time: timestamp(),
-    ip_src: genIP(),
-    ip_dst: genIP(),
-    id: Date.now() + Math.random(),
-    isQuantum
-  };
+  S.totalAttacks++;
+  if(!isQ&&(atk.category==='ai-assisted'||atk.atlas))S.aiAssisted++;
+  if(atk.severity==='critical')S.critCount++;
+  if(atk.severity==='high')S.highCount++;
+  if(atk.category==='model-attack')S.modelAttacks++;
+  if(atk.type.includes('Prompt'))S.promptInj++;
 
-  state.totalAttacks++;
-  if (!isQuantum && (attack.category === 'ai-assisted' || attack.atlas)) state.aiAssisted++;
-  if (attack.severity === 'critical') state.critCount++;
-  if (attack.severity === 'high') state.highCount++;
-  if (attack.category === 'model-attack') state.modelAttacks++;
-  if (attack.type.includes('Prompt')) state.promptInj++;
+  const key=ATLAS_TECHNIQUES.find(t=>atk.type.toLowerCase().includes(t.toLowerCase().split(' ')[0].toLowerCase()))||(isQ?'Quantum/PQC':pick(ATLAS_TECHNIQUES));
+  S.atlasHeat[key]+=rnd(1,5);
+  pick(TARGET_MODELS).attacks++;
 
-  const quantumBucket = "Quantum/PQC";
-  const atlasKey = ATLAS_TECHNIQUES.find(t =>
-    attack.type.toLowerCase().includes(t.toLowerCase().split(' ')[0].toLowerCase())
-  ) || (isQuantum ? quantumBucket : rand(ATLAS_TECHNIQUES));
-  state.atlasHeat[atlasKey] += randInt(1, 5);
-
-  rand(TARGET_MODELS).attacks++;
-
-  createGlobeArc(src, dst, attack.severity, isQuantum);
-  addAttackToFeed(entry);
-  if (Math.random() > 0.3) setTimeout(() => generateAgentLog(entry), randInt(200, 1200));
-
+  fireArc(src,dst,atk.severity,isQ);
+  addFeed(entry);
+  if(Math.random()>0.3)setTimeout(()=>addLog(entry),rnd(200,1200));
   updateStats();
 }
 
-function addAttackToFeed(entry) {
-  const f = state.filter;
-  if (f !== 'all') {
-    if (f === 'critical' && entry.severity !== 'critical') return;
-    if (f === 'ai-assisted' && entry.category !== 'ai-assisted') return;
-    if (f === 'model-attack' && entry.category !== 'model-attack') return;
-    if (f === 'agent' && entry.category !== 'agent') return;
-    if (f === 'quantum' && !entry.isQuantum) return;
+function addFeed(e){
+  const f=S.filter;
+  if(f!=='all'){
+    if(f==='critical'&&e.severity!=='critical')return;
+    if(f==='ai-assisted'&&e.category!=='ai-assisted')return;
+    if(f==='model-attack'&&e.category!=='model-attack')return;
+    if(f==='agent'&&e.category!=='agent')return;
+    if(f==='quantum'&&!e.isQ)return;
   }
+  const fd=document.getElementById('attackFeed');
+  const d=document.createElement('div');
+  d.className=`atk ${e.severity}`;
 
-  const feed = document.getElementById('attackFeed');
-  const div = document.createElement('div');
-  div.className = `attack-entry ${entry.severity}`;
+  const tags=[];
+  if(e.mitre)tags.push(`<span class="tag tag-m">${e.mitre}</span>`);
+  if(e.atlas)tags.push(`<span class="tag tag-a">ATLAS</span>`);
+  if(e.category==='ai-assisted')tags.push(`<span class="tag tag-i">AI-ASSISTED</span>`);
+  if(e.category==='agent')tags.push(`<span class="tag tag-g">AGENT-LEVEL</span>`);
+  if(e.category==='quantum'||e.isQ)tags.push(`<span class="tag tag-q">QUANTUM/PQC</span>`);
 
-  const tags = [];
-  if (entry.mitre) tags.push(`<span class="attack-tag tag-mitre">${entry.mitre}</span>`);
-  if (entry.atlas) tags.push(`<span class="attack-tag tag-atlas">ATLAS</span>`);
-  if (entry.category === 'ai-assisted') tags.push(`<span class="attack-tag tag-ai">AI-ASSISTED</span>`);
-  if (entry.category === 'agent') tags.push(`<span class="attack-tag tag-agent">AGENT-LEVEL</span>`);
-  if (entry.category === 'quantum' || entry.isQuantum) tags.push(`<span class="attack-tag tag-quantum">QUANTUM/PQC</span>`);
-
-  div.innerHTML = `
-    <div class="attack-header">
-      <span class="attack-type">${entry.isQuantum ? '🛰' : '⚡'} ${entry.type}</span>
-      <span class="attack-time">${entry.time}</span>
-    </div>
-    <div class="attack-route">
-      <span>${entry.src.name}, ${entry.src.country}</span> → <span>${entry.dst.name}, ${entry.dst.country}</span>
-    </div>
-    <div class="attack-detail">${entry.desc}</div>
-    <div class="attack-detail" style="margin-top:2px;color:rgba(0,240,255,0.3)">
-      ${entry.ip_src} → ${entry.ip_dst}
-    </div>
-    <div class="attack-tags">${tags.join('')}</div>
-  `;
-
-  feed.insertBefore(div, feed.firstChild);
-  while (feed.children.length > 50) feed.removeChild(feed.lastChild);
+  d.innerHTML=`<div class="atk-top"><span class="atk-name">${e.isQ?'🛰':'⚡'} ${e.type}</span><span class="atk-time">${e.time}</span></div><div class="atk-route"><b>${e.src.name}, ${e.src.country}</b> → <b>${e.dst.name}, ${e.dst.country}</b></div><div class="atk-desc">${e.desc}</div><div class="atk-ips">${e.ip_src} → ${e.ip_dst}</div><div class="atk-tags">${tags.join('')}</div>`;
+  fd.insertBefore(d,fd.firstChild);
+  while(fd.children.length>50)fd.removeChild(fd.lastChild);
 }
 
-function generateAgentLog(attack) {
-  const agent = rand(AGENTS);
-  let action = rand(AGENT_ACTIONS);
-  action = action.replace('{type}', attack.type)
-                 .replace('{src}', attack.src.name)
-                 .replace('{dst}', attack.dst.name)
-                 .replace('{mitre}', attack.mitre || 'T0000');
-
-  const logs = document.getElementById('agentLogs');
-  const div = document.createElement('div');
-  div.className = 'agent-log';
-  div.style.borderLeftColor = agent.color;
-
-  const isWarning = attack.severity === 'critical';
-
-  div.innerHTML = `
-    <span class="agent-name" style="color:${agent.color}">[${agent.name}]</span>
-    <span class="agent-action"> ${action}</span>
-    ${isWarning
-      ? '<br><span class="agent-warning">⚠ ELEVATED — Escalating to quantum-aware threat chain analysis</span>'
-      : '<br><span class="agent-result">✓ Defense protocol executed by Red Team ATOM</span>'}
-  `;
-
-  logs.insertBefore(div, logs.firstChild);
-  while (logs.children.length > 40) logs.removeChild(logs.lastChild);
+function addLog(atk){
+  const ag=pick(AGENTS);
+  let act=pick(AGENT_ACTIONS).replace('{type}',atk.type).replace('{src}',atk.src.name).replace('{dst}',atk.dst.name).replace('{mitre}',atk.mitre||'T0000');
+  const lg=document.getElementById('agentLogs');
+  const d=document.createElement('div');d.className='log';d.style.borderLeftColor=ag.color;
+  const w=atk.severity==='critical';
+  d.innerHTML=`<span class="log-agent" style="color:${ag.color}">[${ag.name}]</span> <span class="log-act">${act}</span><br>${w?'<span class="log-warn">⚠ ELEVATED — Escalating to quantum-aware threat chain analysis</span>':'<span class="log-ok">✓ Defense protocol executed by Red Team ATOM</span>'}`;
+  lg.insertBefore(d,lg.firstChild);
+  while(lg.children.length>40)lg.removeChild(lg.lastChild);
 }
 
-// ===== FILTER =====
-function setFilter(f) {
-  state.filter = f;
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    const t = btn.textContent.toLowerCase();
-    btn.classList.toggle('active',
-      (f === 'all' && t === 'all') ||
-      (f === 'critical' && t === 'critical') ||
-      (f === 'ai-assisted' && t === 'ai-assisted') ||
-      (f === 'model-attack' && t === 'model attack') ||
-      (f === 'agent' && t === 'agent-level') ||
-      (f === 'quantum' && t === 'quantum')
-    );
+function setFilter(f){
+  S.filter=f;
+  document.querySelectorAll('.fbtn').forEach(b=>{
+    const t=b.textContent.toLowerCase();
+    b.classList.toggle('on',
+      (f==='all'&&t==='all')||(f==='critical'&&t==='critical')||(f==='ai-assisted'&&t==='ai-assisted')||
+      (f==='model-attack'&&t==='model attack')||(f==='agent'&&t==='agent-level')||(f==='quantum'&&t==='quantum'));
   });
-  document.getElementById('attackFeed').innerHTML = '';
+  document.getElementById('attackFeed').innerHTML='';
 }
 
-// ===== STATS / MODELS / HEATMAP =====
-function updateStats() {
-  document.getElementById('totalAttacks').textContent = state.totalAttacks.toLocaleString();
-  document.getElementById('aiAssisted').textContent = state.aiAssisted.toLocaleString();
-  document.getElementById('agentsActive').textContent = state.agentsActive;
-  document.getElementById('modelsScanned').textContent = state.modelsScanned;
-  document.getElementById('critCount').textContent = state.critCount;
-  document.getElementById('highCount').textContent = state.highCount;
-  document.getElementById('modelAttacks').textContent = state.modelAttacks;
-  document.getElementById('promptInj').textContent = state.promptInj;
+function updateStats(){
+  animateNum(document.getElementById('totalAttacks'),S.totalAttacks);
+  animateNum(document.getElementById('aiAssisted'),S.aiAssisted);
+  document.getElementById('agentsActive').textContent=S.agentsActive;
+  document.getElementById('modelsScanned').textContent=S.modelsScanned;
+  animateNum(document.getElementById('critCount'),S.critCount);
+  animateNum(document.getElementById('highCount'),S.highCount);
+  animateNum(document.getElementById('modelAttacks'),S.modelAttacks);
+  animateNum(document.getElementById('promptInj'),S.promptInj);
 
-  const sorted = [...TARGET_MODELS].sort((a,b) => b.attacks - a.attacks);
-  const modelsDiv = document.getElementById('targetedModels');
-  modelsDiv.innerHTML = sorted.slice(0, 5).map(m => `
-    <div class="endpoint-row">
-      <span class="endpoint-name">
-        <span class="endpoint-dot" style="background:${m.color};box-shadow:0 0 4px ${m.color}"></span>
-        <span style="color:${m.color}">${m.name}</span>
-      </span>
-      <span class="endpoint-hits">${m.attacks} hits</span>
-    </div>
-  `).join('');
+  const sorted=[...TARGET_MODELS].sort((a,b)=>b.attacks-a.attacks);
+  document.getElementById('targetedModels').innerHTML=sorted.slice(0,5).map(m=>`<div class="ep"><span class="ep-name"><span class="ep-dot" style="background:${m.color};box-shadow:0 0 4px ${m.color}"></span><span style="color:${m.color}">${m.name}</span></span><span class="ep-hits">${m.attacks} hits</span></div>`).join('');
 }
 
-function renderHeatmap() {
-  const container = document.getElementById('atlasHeatmap');
-  container.innerHTML = '';
-  const maxVal = Math.max(...Object.values(state.atlasHeat));
-
-  ATLAS_TECHNIQUES.forEach(tech => {
-    const val = state.atlasHeat[tech];
-    const pct = (val / maxVal) * 100;
-    const hue = tech === "Quantum/PQC" ? 190 : 120 - (pct / 100) * 120;
-
-    const col = document.createElement('div');
-    col.className = 'heatmap-col';
-    col.innerHTML = `
-      <div class="heatmap-bar" style="height:${Math.max(6, pct * 0.65)}px;background:hsl(${hue},75%,48%);box-shadow:0 0 8px hsla(${hue},75%,48%,0.3);"></div>
-      <div class="heatmap-label">${tech}</div>
-    `;
-    col.title = `${tech}: ${val} events`;
-    container.appendChild(col);
+function renderHeatmap(){
+  const c=document.getElementById('atlasHeatmap');c.innerHTML='';
+  const mx=Math.max(...Object.values(S.atlasHeat));
+  ATLAS_TECHNIQUES.forEach(t=>{
+    const v=S.atlasHeat[t],pct=(v/mx)*100;
+    const hue=t==='Quantum/PQC'?190:120-(pct/100)*120;
+    const col=document.createElement('div');col.className='hm-col';
+    col.innerHTML=`<div class="hm-bar" style="height:${Math.max(5,pct*0.6)}px;background:hsl(${hue},75%,48%);box-shadow:0 0 6px hsla(${hue},75%,48%,0.25);color:hsl(${hue},75%,48%)"></div><div class="hm-label">${t}</div>`;
+    col.title=`${t}: ${v} events`;c.appendChild(col);
   });
 }
 
-// ===== ECOSYSTEM =====
-function updateEcosystem() {
-  const signals = randInt(900, 1600);
-  document.getElementById('atomStatus').textContent = `Simulating ${signals} attack signals/s`;
-  const pqcStates = [
-    "Lattice KEM: ACTIVE · Hybrid TLS",
-    "XMSS: ROTATING SIGNATURE KEYS",
-    "NIST PQC PROFILE: ENABLED",
-    "HARVEST-NOW-DECRYPT-LATER RESILIENT"
-  ];
-  document.getElementById('pqcStatus').textContent = pqcStates[randInt(0, pqcStates.length - 1)];
-  state.modelsScanned += randInt(2, 7);
+function updateEco(){
+  const sigs=rnd(900,1600);
+  document.getElementById('atomStatus').textContent=`Ingesting ${sigs} threat signals/s`;
+  const ps=["Lattice KEM: ACTIVE · Hybrid TLS","XMSS: ROTATING SIGNATURE KEYS","NIST PQC PROFILE: ENABLED","HARVEST-NOW-DECRYPT-LATER RESILIENT"];
+  document.getElementById('pqcStatus').textContent=ps[rnd(0,ps.length-1)];
+  S.modelsScanned+=rnd(2,7);
 }
 
-// ===== DATETIME =====
-function updateDateTime() {
-  const d = new Date();
-  document.getElementById('datetime').innerHTML =
-    d.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric', year:'numeric'}) +
-    '<br>' + d.toLocaleTimeString('en-US', {hour12:false}) + ' EST';
+function updateClock(){
+  const d=new Date();
+  document.getElementById('datetime').innerHTML=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})+'<br>'+d.toLocaleTimeString('en-US',{hour12:false})+' EST';
 }
 
-// ===== THREAT LEVEL =====
-function updateThreatLevel() {
-  const levels = [
-    {name: 'CRITICAL', color: '#ff3344'},
-    {name: 'ELEVATED', color: '#ff8800'},
-    {name: 'GUARDED', color: '#ffdd00'},
-  ];
-  const level = state.critCount > 30 ? levels[0] : state.critCount > 15 ? levels[1] : levels[2];
-  const el = document.getElementById('threatLevel');
-  el.textContent = level.name;
-  el.style.color = level.color;
-  el.parentElement.style.borderColor = level.color + '33';
-  el.parentElement.style.background = level.color + '0a';
-  el.parentElement.querySelector('.threat-dot').style.background = level.color;
-  el.parentElement.querySelector('.threat-dot').style.boxShadow = `0 0 8px ${level.color}80`;
+function updateThreat(){
+  const levels=[{n:'CRITICAL',c:'#ff2d3b'},{n:'ELEVATED',c:'#ff7700'},{n:'GUARDED',c:'#ffd600'}];
+  const lv=S.critCount>30?levels[0]:S.critCount>15?levels[1]:levels[2];
+  const el=document.getElementById('threatLevel');
+  el.textContent=lv.n;el.style.color=lv.c;
+  const badge=el.parentElement;
+  badge.style.borderColor=lv.c+'2e';badge.style.background=lv.c+'0a';
+  badge.querySelector('.threat-pulse').style.background=lv.c;
+  badge.querySelector('.threat-pulse').style.boxShadow=`0 0 10px ${lv.c}a0`;
 }
 
-// ===== INIT =====
-function init() {
-  initGlobe();
-  updateDateTime();
-  updateStats();
-  renderHeatmap();
-  updateEcosystem();
+// ══════════ INIT ══════════
+function init(){
+  initGlobe();updateClock();updateStats();renderHeatmap();updateEco();
 
-  // Staggered start for attack generation
-  setTimeout(() => {
-    (function scheduleAttack() {
-      generateAttack();
-      const delay = randInt(500, 2500);
-      setTimeout(scheduleAttack, delay);
-    })();
-  }, 1000);
-
-  // Burst attacks
-  setInterval(() => {
-    const burst = randInt(3, 7);
-    for (let i = 0; i < burst; i++) setTimeout(generateAttack, i * 200);
-  }, randInt(8000, 15000));
-
-  setInterval(renderHeatmap, 3000);
-  setInterval(updateEcosystem, 4000);
-  setInterval(updateDateTime, 1000);
-  setInterval(updateThreatLevel, 5000);
+  setTimeout(()=>{(function loop(){genAttack();setTimeout(loop,rnd(500,2200))})();},800);
+  setInterval(()=>{const n=rnd(3,7);for(let i=0;i<n;i++)setTimeout(genAttack,i*180);},rnd(8000,14000));
+  setInterval(renderHeatmap,3000);
+  setInterval(updateEco,4000);
+  setInterval(updateClock,1000);
+  setInterval(updateThreat,5000);
 }
-
 init();
 </script>
 </body>
