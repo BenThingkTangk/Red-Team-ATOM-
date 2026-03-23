@@ -12,18 +12,18 @@
   --bg-panel: rgba(3, 6, 14, 0.78);
   --bg-card: rgba(6, 12, 24, 0.5);
   --bg-card-hover: rgba(10, 18, 36, 0.65);
-  --cyan: #00e8ff;
-  --magenta: #ff00aa;
-  --red: #ff2d3b;
-  --orange: #ff7700;
-  --green: #00ff88;
-  --yellow: #ffd600;
-  --purple: #7744ff;
-  --text-1: #e4e8f0;
-  --text-2: #5a6d88;
-  --text-3: #263044;
-  --border: rgba(0, 232, 255, 0.05);
-  --border-hover: rgba(0, 232, 255, 0.12);
+  --cyan: #00d4ff;
+  --magenta: #e930ff;
+  --red: #ff1744;
+  --orange: #ff6d00;
+  --green: #00e676;
+  --yellow: #ffc400;
+  --purple: #7c4dff;
+  --text-1: #e8ecf4;
+  --text-2: #6580a0;
+  --text-3: #283848;
+  --border: rgba(0, 212, 255, 0.05);
+  --border-hover: rgba(0, 212, 255, 0.14);
   --radius: 10px;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -101,7 +101,7 @@ body {
 }
 .brand-sub {
   font-family: 'JetBrains Mono', monospace; font-size: 7.5px;
-  color: var(--text-3); letter-spacing: 2.5px;
+  color: var(--text-2); letter-spacing: 2.5px; font-weight: 600;
 }
 
 .header-center { display: flex; align-items: center; gap: 22px; }
@@ -248,7 +248,7 @@ body {
 .atk:hover { background: var(--bg-card-hover); transform: translateX(2px); }
 @keyframes atkIn { from { opacity: 0; transform: translateX(-14px) scale(0.97); } }
 
-.atk.critical { border-color: var(--red); }
+.atk.critical { border-color: var(--red); background: rgba(255,23,68,0.04); }
 .atk.high { border-color: var(--orange); }
 .atk.medium { border-color: var(--yellow); }
 .atk.low { border-color: var(--green); }
@@ -323,8 +323,27 @@ body {
 .log:hover { background: rgba(255,0,170,0.02); }
 .log-agent { font-weight: 600; }
 .log-act { color: var(--text-2); }
-.log-ok { color: var(--green); opacity: 0.75; }
-.log-warn { color: var(--orange); opacity: 0.85; }
+.log-ok { color: var(--green); opacity: 0.8; }
+.log-warn { color: var(--red); opacity: 0.9; font-weight: 600; }
+
+/* Defense counters */
+.def-counters {
+  display: flex; gap: 8px; padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(0,0,0,0.15);
+}
+.def-counter {
+  display: flex; align-items: center; gap: 4px;
+  font-family: 'JetBrains Mono', monospace; font-size: 8px;
+}
+.def-counter .def-val {
+  font-weight: 700; font-size: 11px;
+  transition: color 0.3s;
+}
+.def-counter .def-lbl {
+  font-size: 6.5px; letter-spacing: 1px; color: var(--text-3);
+  text-transform: uppercase; font-weight: 600;
+}
 
 /* ═══ BOTTOM PANEL ═══ */
 .panel-bottom {
@@ -494,17 +513,23 @@ body {
   <div class="cards">
     <div class="card"><div class="v" style="color:var(--red)" id="critCount">0</div><div class="l">Critical</div></div>
     <div class="card"><div class="v" style="color:var(--orange)" id="highCount">0</div><div class="l">High</div></div>
-    <div class="card"><div class="v" style="color:var(--cyan)" id="modelAttacks">0</div><div class="l">Model Attacks</div></div>
+    <div class="card"><div class="v" style="color:var(--cyan)" id="modelAttacks">0</div><div class="l">Attacks</div></div>
     <div class="card"><div class="v" style="color:var(--magenta)" id="promptInj">0</div><div class="l">Prompt Inject</div></div>
   </div>
   <div class="panel-head" style="border-top:1px solid var(--border)">
-    <span class="panel-label"><span class="ico">🎯</span> TOP TARGETED ENDPOINTS</span>
+    <span class="panel-label"><span class="ico">🎯</span> TOP TARGETED</span>
   </div>
   <div id="targetedModels" class="ep-list"></div>
   <div class="log-section">
     <div class="panel-head">
       <span class="panel-label" style="color:var(--magenta)"><span class="ico">🤖</span> RED TEAM ATOM DEFENSE LOG</span>
       <span class="panel-dot" style="background:var(--magenta);box-shadow:0 0 6px rgba(255,0,170,0.5)"></span>
+    </div>
+    <div class="def-counters">
+      <div class="def-counter"><span class="def-val" style="color:var(--green)" id="defBlocked">0</span><span class="def-lbl">Blocked</span></div>
+      <div class="def-counter"><span class="def-val" style="color:var(--cyan)" id="defContained">0</span><span class="def-lbl">Contained</span></div>
+      <div class="def-counter"><span class="def-val" style="color:var(--red)" id="defEscalated">0</span><span class="def-lbl">Escalated</span></div>
+      <div class="def-counter"><span class="def-val" style="color:var(--yellow)" id="defMTTR">0ms</span><span class="def-lbl">Avg MTTR</span></div>
     </div>
     <div class="logs" id="agentLogs"></div>
   </div>
@@ -643,20 +668,36 @@ const AGENT_ACTIONS=[
   "Cross-domain correlation: {type} blocked at pre-execution stage",
 ];
 
+// Real-world targeted systems based on public threat intelligence
+// Sources: OWASP LLM Top 10 2025, CrowdStrike GTG-1002, Bright Security 2026 State of LLM Security,
+// CSO Online AI Threats 2025, Anthropic incident disclosures, CISA KEV catalog
 const TARGET_MODELS=[
-  {name:"GPT-4o Endpoint",attacks:0,color:"#ff2d3b"},
-  {name:"Claude Prod API",attacks:0,color:"#ff7700"},
-  {name:"Gemini Vision",attacks:0,color:"#ffd600"},
-  {name:"ATOM-Core v3.1",attacks:0,color:"#00e8ff"},
-  {name:"LLaMA-3 Fine-tune",attacks:0,color:"#7744ff"},
-  {name:"PQC Engine",attacks:0,color:"#00ff88"},
-  {name:"Mistral-Large",attacks:0,color:"#ff00aa"},
+  // AI-Assisted — real LLM APIs and inference endpoints under active attack
+  {name:"OpenAI GPT-4o API",attacks:0,color:"#ff1744",cat:"ai"},
+  {name:"Anthropic Claude API",attacks:0,color:"#ff6d00",cat:"ai"},
+  {name:"Google Gemini API",attacks:0,color:"#ffc400",cat:"ai"},
+  {name:"Meta LLaMA Inference",attacks:0,color:"#7c4dff",cat:"ai"},
+  {name:"Mistral / HuggingFace",attacks:0,color:"#e930ff",cat:"ai"},
+  {name:"Azure OpenAI Service",attacks:0,color:"#00b0ff",cat:"ai"},
+  // Agent-level — agentic frameworks and tool chains
+  {name:"LangChain / LangFlow",attacks:0,color:"#ff5252",cat:"agent"},
+  {name:"MCP Tool Servers",attacks:0,color:"#ff9100",cat:"agent"},
+  {name:"Microsoft Copilot",attacks:0,color:"#00b0ff",cat:"agent"},
+  {name:"GitHub Copilot",attacks:0,color:"#69f0ae",cat:"agent"},
+  {name:"Salesforce Einstein",attacks:0,color:"#00e5ff",cat:"agent"},
+  // Quantum — PQC-vulnerable critical infrastructure
+  {name:"RSA-2048 TLS Backbone",attacks:0,color:"#00d4ff",cat:"quantum"},
+  {name:"US Power Grid SCADA",attacks:0,color:"#00e676",cat:"quantum"},
+  {name:"SWIFT Interbank Net",attacks:0,color:"#ffc400",cat:"quantum"},
+  {name:"Federal PKI Root CAs",attacks:0,color:"#448aff",cat:"quantum"},
+  {name:"5G Core ECC Auth",attacks:0,color:"#b388ff",cat:"quantum"},
 ];
 
 // ══════════ STATE ══════════
 let S={
   totalAttacks:14847, aiAssisted:3291, agentsActive:6, modelsScanned:847,
   critCount:0, highCount:0, modelAttacks:0, promptInj:0,
+  defBlocked:0, defContained:0, defEscalated:0, mttrSum:0, mttrCount:0,
   atlasHeat:{}, filter:'all',
 };
 ATLAS_TECHNIQUES.forEach(t=>S.atlasHeat[t]=Math.floor(Math.random()*40)+5);
@@ -688,7 +729,7 @@ function initGlobe(){
     .bumpImageUrl('https://unpkg.com/three-globe@2.35.1/example/img/earth-topology.png')
     .backgroundImageUrl('')
     .backgroundColor('rgba(0,0,0,0)')
-    .atmosphereColor('#0088ff')
+    .atmosphereColor('#0066dd')
     .atmosphereAltitude(0.22)
     .showGraticules(true)
     .pointsData(pts).pointAltitude('size').pointColor('color').pointRadius(0.22).pointsMerge(true)
@@ -728,10 +769,10 @@ function initGlobe(){
 
 function fireArc(from,to,severity,isQ){
   const cmap={
-    critical:isQ?['rgba(0,232,255,0.9)','rgba(0,232,255,0.25)']:['rgba(255,45,59,0.9)','rgba(255,45,59,0.25)'],
-    high:isQ?['rgba(0,180,255,0.8)','rgba(0,180,255,0.2)']:['rgba(255,119,0,0.8)','rgba(255,119,0,0.2)'],
-    medium:isQ?['rgba(50,255,220,0.7)','rgba(50,255,220,0.15)']:['rgba(255,214,0,0.7)','rgba(255,214,0,0.15)'],
-    low:['rgba(0,255,136,0.7)','rgba(0,255,136,0.15)']
+    critical:isQ?['rgba(0,212,255,0.95)','rgba(0,212,255,0.3)']:['rgba(255,23,68,0.95)','rgba(255,23,68,0.3)'],
+    high:isQ?['rgba(0,170,255,0.8)','rgba(0,170,255,0.2)']:['rgba(255,109,0,0.85)','rgba(255,109,0,0.2)'],
+    medium:isQ?['rgba(40,255,210,0.7)','rgba(40,255,210,0.15)']:['rgba(255,196,0,0.75)','rgba(255,196,0,0.15)'],
+    low:['rgba(0,230,118,0.7)','rgba(0,230,118,0.15)']
   };
   const arc={
     startLat:from.lat,startLng:from.lon,endLat:to.lat,endLng:to.lon,
@@ -743,7 +784,7 @@ function fireArc(from,to,severity,isQ){
   arcsData.push(arc);
   globe.arcsData([...arcsData]);
 
-  const rgbMap={critical:isQ?'0,232,255':'255,45,59',high:isQ?'0,180,255':'255,119,0',medium:isQ?'50,255,220':'255,214,0',low:'0,255,136'};
+  const rgbMap={critical:isQ?'0,212,255':'255,23,68',high:isQ?'0,170,255':'255,109,0',medium:isQ?'40,255,210':'255,196,0',low:'0,230,118'};
   const ring={lat:to.lat,lng:to.lon,rgb:rgbMap[severity]||'0,232,255'};
   ringsData.push(ring);
   globe.ringsData([...ringsData]);
@@ -768,7 +809,11 @@ function genAttack(){
 
   const key=ATLAS_TECHNIQUES.find(t=>atk.type.toLowerCase().includes(t.toLowerCase().split(' ')[0].toLowerCase()))||(isQ?'Quantum/PQC':pick(ATLAS_TECHNIQUES));
   S.atlasHeat[key]+=rnd(1,5);
-  pick(TARGET_MODELS).attacks++;
+  // Target selection weighted by attack category
+  const catMap={"ai-assisted":"ai","model-attack":"ai","agent":"agent","quantum":"quantum"};
+  const atkCat=catMap[atk.category]||(isQ?'quantum':'ai');
+  const catTargets=TARGET_MODELS.filter(t=>t.cat===atkCat);
+  (catTargets.length?pick(catTargets):pick(TARGET_MODELS)).attacks++;
 
   fireArc(src,dst,atk.severity,isQ);
   addFeed(entry);
@@ -806,10 +851,27 @@ function addLog(atk){
   let act=pick(AGENT_ACTIONS).replace('{type}',atk.type).replace('{src}',atk.src.name).replace('{dst}',atk.dst.name).replace('{mitre}',atk.mitre||'T0000');
   const lg=document.getElementById('agentLogs');
   const d=document.createElement('div');d.className='log';d.style.borderLeftColor=ag.color;
-  const w=atk.severity==='critical';
-  d.innerHTML=`<span class="log-agent" style="color:${ag.color}">[${ag.name}]</span> <span class="log-act">${act}</span><br>${w?'<span class="log-warn">⚠ ELEVATED — Escalating to quantum-aware threat chain analysis</span>':'<span class="log-ok">✓ Defense protocol executed by Red Team ATOM</span>'}`;
+  const isCrit=atk.severity==='critical';
+
+  // Defense counter tracking
+  const mttr=rnd(8,340);
+  S.mttrSum+=mttr; S.mttrCount++;
+  if(isCrit){ S.defEscalated++; S.defContained++; }
+  else{ S.defBlocked++; }
+
+  const outcomeTag=isCrit
+    ?`<span class="log-warn">⚠ ESCALATED — Quantum-aware threat chain analysis · MTTR ${mttr}ms</span>`
+    :`<span class="log-ok">✓ BLOCKED in ${mttr}ms — Defense protocol executed</span>`;
+
+  d.innerHTML=`<span class="log-agent" style="color:${ag.color}">[${ag.name}]</span> <span class="log-act">${act}</span><br>${outcomeTag}`;
   lg.insertBefore(d,lg.firstChild);
   while(lg.children.length>40)lg.removeChild(lg.lastChild);
+
+  // Update defense counters
+  animateNum(document.getElementById('defBlocked'),S.defBlocked);
+  animateNum(document.getElementById('defContained'),S.defContained);
+  animateNum(document.getElementById('defEscalated'),S.defEscalated);
+  document.getElementById('defMTTR').textContent=S.mttrCount?Math.round(S.mttrSum/S.mttrCount)+'ms':'0ms';
 }
 
 function setFilter(f){
@@ -834,7 +896,7 @@ function updateStats(){
   animateNum(document.getElementById('promptInj'),S.promptInj);
 
   const sorted=[...TARGET_MODELS].sort((a,b)=>b.attacks-a.attacks);
-  document.getElementById('targetedModels').innerHTML=sorted.slice(0,5).map(m=>`<div class="ep"><span class="ep-name"><span class="ep-dot" style="background:${m.color};box-shadow:0 0 4px ${m.color}"></span><span style="color:${m.color}">${m.name}</span></span><span class="ep-hits">${m.attacks} hits</span></div>`).join('');
+  document.getElementById('targetedModels').innerHTML=sorted.slice(0,6).map(m=>`<div class="ep"><span class="ep-name"><span class="ep-dot" style="background:${m.color};box-shadow:0 0 4px ${m.color}"></span><span style="color:${m.color}">${m.name}</span></span><span class="ep-hits">${m.attacks} hits</span></div>`).join('');
 }
 
 function renderHeatmap(){
