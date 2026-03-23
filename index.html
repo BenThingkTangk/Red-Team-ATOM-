@@ -8,9 +8,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
 
 :root {
-  --bg-primary: #0a0e17;
-  --bg-secondary: #0d1321;
-  --bg-panel: rgba(13, 19, 33, 0.92);
+  --bg-primary: #06080e;
+  --bg-secondary: #0a0f1a;
+  --bg-panel: rgba(8, 12, 22, 0.82);
+  --bg-card: rgba(12, 18, 32, 0.6);
   --accent-cyan: #00f0ff;
   --accent-magenta: #ff00aa;
   --accent-red: #ff3344;
@@ -19,10 +20,14 @@
   --accent-yellow: #ffdd00;
   --accent-purple: #8855ff;
   --text-primary: #e8ecf4;
-  --text-secondary: #7a8ba8;
-  --border-color: rgba(0, 240, 255, 0.15);
-  --glow-cyan: 0 0 20px rgba(0, 240, 255, 0.3);
-  --glow-red: 0 0 20px rgba(255, 51, 68, 0.4);
+  --text-secondary: #5a6b82;
+  --text-muted: #3a4558;
+  --border-color: rgba(0, 240, 255, 0.08);
+  --border-glow: rgba(0, 240, 255, 0.18);
+  --glow-cyan: 0 0 30px rgba(0, 240, 255, 0.15);
+  --glow-red: 0 0 20px rgba(255, 51, 68, 0.3);
+  --panel-radius: 12px;
+  --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -30,7 +35,7 @@
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', -apple-system, sans-serif;
   overflow: hidden;
   height: 100vh;
   width: 100vw;
@@ -39,196 +44,221 @@ body {
 /* HEADER */
 .header {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  background: linear-gradient(180deg, rgba(10,14,23,0.98) 0%, rgba(10,14,23,0.85) 100%);
+  background: rgba(6, 8, 14, 0.7);
   border-bottom: 1px solid var(--border-color);
-  padding: 8px 20px;
+  padding: 0 24px;
+  height: 52px;
   display: flex; align-items: center; justify-content: space-between;
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
 }
 
 .header-left {
-  display: flex; align-items: center; gap: 16px;
+  display: flex; align-items: center; gap: 14px;
 }
 
 .logo-mark {
-  width: 36px; height: 36px;
-  background: conic-gradient(from 0deg, var(--accent-cyan), var(--accent-magenta), var(--accent-cyan));
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  animation: logoSpin 8s linear infinite;
+  width: 32px; height: 32px;
   position: relative;
+  display: flex; align-items: center; justify-content: center;
 }
-.logo-mark::after {
-  content: '⚛';
-  font-size: 18px;
-  color: var(--bg-primary);
-}
-@keyframes logoSpin {
-  0% { filter: hue-rotate(0deg); }
-  100% { filter: hue-rotate(360deg); }
+.logo-mark svg {
+  width: 32px; height: 32px;
 }
 
 .brand-text {
-  display: flex; flex-direction: column;
+  display: flex; flex-direction: column; gap: 1px;
 }
 .brand-name {
   font-family: 'Orbitron', monospace;
   font-weight: 900;
-  font-size: 14px;
-  letter-spacing: 4px;
-  background: linear-gradient(90deg, var(--accent-cyan), #fff, var(--accent-magenta));
+  font-size: 13px;
+  letter-spacing: 3px;
+  background: linear-gradient(90deg, #fff 0%, var(--accent-cyan) 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
 .brand-sub {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  color: var(--text-secondary);
-  letter-spacing: 2px;
+  font-size: 8px;
+  color: var(--text-muted);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
 }
 
 .header-center {
-  display: flex; align-items: center; gap: 24px;
+  display: flex; align-items: center; gap: 20px;
 }
 
 .threat-level-badge {
-  display: flex; align-items: center; gap: 8px;
-  background: rgba(255,51,68,0.1);
-  border: 1px solid rgba(255,51,68,0.3);
+  display: flex; align-items: center; gap: 7px;
+  background: rgba(255,51,68,0.06);
+  border: 1px solid rgba(255,51,68,0.2);
   border-radius: 20px;
-  padding: 4px 14px;
-  animation: threatPulse 2s ease-in-out infinite;
+  padding: 5px 14px;
+  transition: all 0.5s var(--transition-smooth);
 }
-@keyframes threatPulse {
-  0%,100% { box-shadow: 0 0 5px rgba(255,51,68,0.2); }
-  50% { box-shadow: 0 0 20px rgba(255,51,68,0.5); }
+.threat-level-badge:hover {
+  background: rgba(255,51,68,0.12);
+  border-color: rgba(255,51,68,0.4);
 }
 .threat-dot {
-  width: 8px; height: 8px;
+  width: 7px; height: 7px;
   background: var(--accent-red);
   border-radius: 50%;
-  animation: blink 1s infinite;
+  animation: pulse-dot 2s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(255,51,68,0.6);
 }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+@keyframes pulse-dot {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
 .threat-label {
   font-family: 'Orbitron', monospace;
-  font-size: 10px; font-weight: 700;
+  font-size: 9px; font-weight: 700;
   color: var(--accent-red);
   letter-spacing: 2px;
 }
 
 .stat-chips {
-  display: flex; gap: 16px;
+  display: flex; gap: 20px;
 }
 .stat-chip {
-  display: flex; flex-direction: column; align-items: center;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
 }
 .stat-val {
-  font-family: 'Orbitron', monospace;
-  font-size: 16px; font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px; font-weight: 600;
   color: var(--accent-cyan);
+  letter-spacing: 0.5px;
 }
 .stat-label {
-  font-size: 8px; letter-spacing: 1.5px;
-  color: var(--text-secondary);
+  font-size: 7px; letter-spacing: 1.5px;
+  color: var(--text-muted);
   text-transform: uppercase;
+  font-weight: 500;
 }
 
 .header-right {
-  display: flex; align-items: center; gap: 12px;
+  display: flex; align-items: center; gap: 14px;
 }
 .eco-badge {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
+  font-family: 'Orbitron', monospace;
+  font-size: 8px; font-weight: 700;
   padding: 3px 10px;
-  border-radius: 10px;
-  border: 1px solid;
-  letter-spacing: 1px;
+  border-radius: 6px;
+  letter-spacing: 2px;
 }
-.eco-atom { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+.eco-atom {
+  background: rgba(0,240,255,0.08);
+  border: 1px solid rgba(0,240,255,0.2);
+  color: var(--accent-cyan);
+}
 
 .datetime {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
+  font-size: 9px;
   color: var(--text-secondary);
   text-align: right;
+  line-height: 1.5;
+  letter-spacing: 0.5px;
 }
 
-/* MAP CONTAINER */
-.map-container {
+/* GLOBE CONTAINER */
+.globe-container {
   position: absolute;
-  top: 56px; left: 0; right: 0; bottom: 0;
+  top: 52px; left: 0; right: 0; bottom: 0;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 50%, #0a1628 0%, #040610 70%);
 }
 
-canvas#globeCanvas {
-  width: 100%; height: 100%;
-  background: radial-gradient(ellipse at center, #0d1a2d 0%, #060a12 70%);
-}
-
-/* ATTACK LINES SVG OVERLAY */
-svg#attackOverlay {
+/* Ambient glow behind globe */
+.globe-container::before {
+  content: '';
   position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50vw; height: 50vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,240,255,0.04) 0%, transparent 70%);
   pointer-events: none;
+  z-index: 0;
 }
 
-/* SIDE PANELS */
+/* PANELS */
 .panel {
   position: absolute;
   background: var(--bg-panel);
   border: 1px solid var(--border-color);
-  backdrop-filter: blur(16px);
-  border-radius: 8px;
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  border-radius: var(--panel-radius);
   overflow: hidden;
+  z-index: 10;
+  transition: border-color 0.4s ease;
+}
+.panel:hover {
+  border-color: var(--border-glow);
 }
 
 .panel-header {
-  padding: 10px 14px;
+  padding: 10px 16px;
   border-bottom: 1px solid var(--border-color);
   display: flex; align-items: center; justify-content: space-between;
+  background: rgba(0,0,0,0.15);
 }
 .panel-title {
   font-family: 'Orbitron', monospace;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   letter-spacing: 2px;
   color: var(--accent-cyan);
+  display: flex; align-items: center; gap: 8px;
+}
+.panel-title .icon {
+  font-size: 12px;
+  opacity: 0.8;
 }
 .panel-indicator {
-  width: 6px; height: 6px;
+  width: 5px; height: 5px;
   border-radius: 50%;
   background: var(--accent-green);
-  animation: blink 1.5s infinite;
+  box-shadow: 0 0 6px rgba(0,255,136,0.5);
+  animation: pulse-dot 2.5s ease-in-out infinite;
 }
 
-/* LEFT PANEL: AI ATTACK FEED */
+/* LEFT PANEL */
 .panel-left {
-  top: 66px; left: 10px; width: 320px; bottom: 10px;
+  top: 62px; left: 12px; width: 310px; bottom: 12px;
 }
 .attack-feed {
-  padding: 6px;
+  padding: 6px 8px;
   overflow-y: auto;
-  max-height: calc(100vh - 220px);
+  max-height: calc(100vh - 200px);
   scrollbar-width: thin;
-  scrollbar-color: var(--accent-cyan) transparent;
+  scrollbar-color: rgba(0,240,255,0.2) transparent;
 }
 .attack-feed::-webkit-scrollbar { width: 3px; }
-.attack-feed::-webkit-scrollbar-thumb { background: var(--accent-cyan); border-radius: 3px; }
+.attack-feed::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.25); border-radius: 3px; }
+.attack-feed::-webkit-scrollbar-track { background: transparent; }
 
 .attack-entry {
-  padding: 8px 10px;
+  padding: 10px 12px;
   margin-bottom: 4px;
-  border-radius: 6px;
+  border-radius: 8px;
   border-left: 3px solid;
-  background: rgba(0,0,0,0.3);
-  animation: fadeSlideIn 0.4s ease-out;
+  background: var(--bg-card);
+  animation: slideIn 0.35s var(--transition-smooth);
   font-size: 11px;
-  transition: background 0.2s;
+  transition: all 0.25s ease;
+  cursor: default;
 }
-.attack-entry:hover { background: rgba(0, 240, 255, 0.05); }
-@keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateX(-20px); }
-  to { opacity: 1; transform: translateX(0); }
+.attack-entry:hover {
+  background: rgba(0, 240, 255, 0.04);
+  transform: translateX(2px);
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-12px) scale(0.98); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
 }
 
 .attack-entry.critical { border-color: var(--accent-red); }
@@ -238,7 +268,7 @@ svg#attackOverlay {
 
 .attack-header {
   display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 }
 .attack-type {
   font-family: 'JetBrains Mono', monospace;
@@ -252,40 +282,43 @@ svg#attackOverlay {
 
 .attack-time {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  color: var(--text-secondary);
+  font-size: 8px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
 }
 .attack-route {
   font-size: 10px;
   color: var(--text-secondary);
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 .attack-route span { color: var(--text-primary); font-weight: 500; }
 .attack-detail {
   font-size: 9px;
   color: var(--text-secondary);
   font-family: 'JetBrains Mono', monospace;
-  line-height: 1.4;
+  line-height: 1.5;
+  opacity: 0.8;
 }
 .attack-tags {
-  display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap;
+  display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap;
 }
 .attack-tag {
-  font-size: 8px;
-  padding: 1px 6px;
-  border-radius: 8px;
+  font-size: 7px;
+  padding: 2px 7px;
+  border-radius: 4px;
   font-family: 'JetBrains Mono', monospace;
   letter-spacing: 0.5px;
+  font-weight: 500;
 }
-.tag-mitre { background: rgba(136,85,255,0.2); color: var(--accent-purple); }
-.tag-atlas { background: rgba(0,240,255,0.15); color: var(--accent-cyan); }
-.tag-ai { background: rgba(255,0,170,0.15); color: var(--accent-magenta); }
-.tag-agent { background: rgba(0,255,136,0.15); color: var(--accent-green); }
-.tag-quantum { background: rgba(0,255,255,0.15); color: var(--accent-cyan); }
+.tag-mitre { background: rgba(136,85,255,0.12); color: var(--accent-purple); border: 1px solid rgba(136,85,255,0.15); }
+.tag-atlas { background: rgba(0,240,255,0.08); color: var(--accent-cyan); border: 1px solid rgba(0,240,255,0.12); }
+.tag-ai { background: rgba(255,0,170,0.08); color: var(--accent-magenta); border: 1px solid rgba(255,0,170,0.12); }
+.tag-agent { background: rgba(0,255,136,0.08); color: var(--accent-green); border: 1px solid rgba(0,255,136,0.12); }
+.tag-quantum { background: rgba(0,240,255,0.08); color: var(--accent-cyan); border: 1px solid rgba(0,240,255,0.12); }
 
-/* RIGHT PANEL: AI AGENT LOGS & ANALYTICS */
+/* RIGHT PANEL */
 .panel-right {
-  top: 66px; right: 10px; width: 320px; bottom: 10px;
+  top: 62px; right: 12px; width: 310px; bottom: 12px;
   display: flex; flex-direction: column;
 }
 
@@ -293,27 +326,62 @@ svg#attackOverlay {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
-  padding: 8px;
+  padding: 10px;
 }
 .analytic-card {
-  background: rgba(0,0,0,0.3);
-  border-radius: 6px;
-  padding: 8px 10px;
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 10px 12px;
   text-align: center;
-  border: 1px solid rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.03);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.analytic-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,240,255,0.2), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.analytic-card:hover::before { opacity: 1; }
+.analytic-card:hover {
+  border-color: rgba(255,255,255,0.06);
+  background: rgba(12, 18, 32, 0.8);
 }
 .analytic-card .val {
-  font-family: 'Orbitron', monospace;
-  font-size: 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
   font-weight: 700;
+  letter-spacing: -0.5px;
 }
 .analytic-card .label {
-  font-size: 8px;
-  letter-spacing: 1px;
-  color: var(--text-secondary);
+  font-size: 7px;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
   text-transform: uppercase;
-  margin-top: 2px;
+  margin-top: 4px;
+  font-weight: 600;
 }
+
+.endpoints-section { padding: 0; }
+.endpoint-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 5px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  transition: background 0.2s;
+}
+.endpoint-row:hover { background: rgba(0,240,255,0.02); }
+.endpoint-name { display: flex; align-items: center; gap: 6px; }
+.endpoint-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+}
+.endpoint-hits { color: var(--text-muted); }
 
 .agent-log-section {
   flex: 1;
@@ -321,61 +389,63 @@ svg#attackOverlay {
   display: flex;
   flex-direction: column;
 }
-.agent-log-section .panel-header { border-top: 1px solid var(--border-color); }
+.agent-log-section .panel-header {
+  border-top: 1px solid var(--border-color);
+}
 
 .agent-logs {
-  padding: 6px;
+  padding: 6px 8px;
   overflow-y: auto;
   flex: 1;
   scrollbar-width: thin;
-  scrollbar-color: var(--accent-magenta) transparent;
+  scrollbar-color: rgba(255,0,170,0.2) transparent;
 }
 .agent-logs::-webkit-scrollbar { width: 3px; }
-.agent-logs::-webkit-scrollbar-thumb { background: var(--accent-magenta); border-radius: 3px; }
+.agent-logs::-webkit-scrollbar-thumb { background: rgba(255,0,170,0.25); border-radius: 3px; }
 
 .agent-log {
-  padding: 6px 8px;
+  padding: 7px 10px;
   margin-bottom: 3px;
-  border-radius: 4px;
-  background: rgba(0,0,0,0.25);
+  border-radius: 6px;
+  background: var(--bg-card);
   font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  line-height: 1.5;
-  animation: fadeSlideIn 0.3s ease-out;
+  font-size: 8.5px;
+  line-height: 1.6;
+  animation: slideIn 0.3s var(--transition-smooth);
   border-left: 2px solid var(--accent-magenta);
+  transition: background 0.2s;
 }
-.agent-name {
-  font-weight: 600;
-  color: var(--accent-magenta);
-}
-.agent-action {
-  color: var(--text-secondary);
-}
-.agent-result {
-  color: var(--accent-green);
-}
-.agent-warning {
-  color: var(--accent-orange);
-}
+.agent-log:hover { background: rgba(255,0,170,0.03); }
+.agent-name { font-weight: 600; }
+.agent-action { color: var(--text-secondary); }
+.agent-result { color: var(--accent-green); opacity: 0.8; }
+.agent-warning { color: var(--accent-orange); opacity: 0.9; }
 
-/* BOTTOM PANEL: MITRE ATLAS HEATMAP */
+/* BOTTOM PANEL */
 .panel-bottom {
   position: absolute;
-  bottom: 10px;
-  left: 340px;
-  right: 340px;
-  height: 120px;
+  bottom: 12px;
+  left: 332px;
+  right: 332px;
+  height: 115px;
   background: var(--bg-panel);
   border: 1px solid var(--border-color);
-  backdrop-filter: blur(16px);
-  border-radius: 8px;
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  border-radius: var(--panel-radius);
   display: flex;
   flex-direction: column;
+  z-index: 10;
+  transition: border-color 0.4s ease;
 }
+.panel-bottom:hover {
+  border-color: var(--border-glow);
+}
+
 .heatmap-container {
   display: flex;
-  padding: 6px 10px;
-  gap: 3px;
+  padding: 4px 12px 6px;
+  gap: 4px;
   flex: 1;
   align-items: flex-end;
 }
@@ -384,80 +454,55 @@ svg#attackOverlay {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
+  cursor: default;
 }
+.heatmap-col:hover .heatmap-bar { filter: brightness(1.3); }
 .heatmap-bar {
   width: 100%;
-  border-radius: 2px;
+  border-radius: 3px 3px 1px 1px;
   min-height: 4px;
-  transition: height 0.5s ease, background 0.5s ease;
+  transition: height 0.6s var(--transition-smooth), background 0.5s ease, filter 0.2s;
 }
 .heatmap-label {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 7px;
-  color: var(--text-secondary);
+  font-size: 6.5px;
+  color: var(--text-muted);
   text-align: center;
   writing-mode: vertical-rl;
   text-orientation: mixed;
   transform: rotate(180deg);
-  max-height: 60px;
+  max-height: 50px;
   overflow: hidden;
+  letter-spacing: 0.3px;
 }
 
-/* FLOATING ATTACK ARCS */
-.attack-arc {
-  fill: none;
-  stroke-linecap: round;
-  animation: arcDash 2s linear forwards;
-  opacity: 0;
-}
-@keyframes arcDash {
-  0% { stroke-dashoffset: 1000; opacity: 0; }
-  10% { opacity: 0.8; }
-  90% { opacity: 0.6; }
-  100% { stroke-dashoffset: 0; opacity: 0; }
-}
-
-/* PULSING DOTS ON MAP */
-.map-dot {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-}
-.map-dot::after {
-  content: '';
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%; height: 100%;
-  border-radius: 50%;
-  animation: dotPulse 2s ease-out infinite;
-}
-@keyframes dotPulse {
-  0% { width: 100%; height: 100%; opacity: 1; box-shadow: 0 0 10px currentColor; }
-  100% { width: 400%; height: 400%; opacity: 0; box-shadow: 0 0 30px currentColor; }
-}
-
-/* ECOSYSTEM STRIP (Red Team ATOM + PQC) */
+/* ECO STRIP */
 .eco-strip {
   position: absolute;
-  top: 66px;
-  left: 340px;
-  right: 340px;
+  top: 62px;
+  left: 332px;
+  right: 332px;
   display: flex;
   gap: 8px;
-  padding: 0 8px;
+  z-index: 10;
 }
 .eco-module {
   flex: 1;
   background: var(--bg-panel);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 6px 10px;
+  border-radius: 8px;
+  padding: 8px 14px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  backdrop-filter: blur(10px);
+  gap: 10px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all 0.3s ease;
+}
+.eco-module:hover {
+  border-color: var(--border-glow);
+  background: rgba(8, 12, 22, 0.9);
 }
 .eco-icon {
   width: 28px; height: 28px;
@@ -466,36 +511,69 @@ svg#attackOverlay {
   font-size: 14px;
   flex-shrink: 0;
 }
-.eco-icon.atom-bg { background: linear-gradient(135deg, rgba(0,240,255,0.2), rgba(0,240,255,0.05)); }
-.eco-icon.pqc-bg { background: linear-gradient(135deg, rgba(255,136,0,0.2), rgba(255,136,0,0.05)); }
-.eco-module-info { display: flex; flex-direction: column; }
+.eco-icon.atom-bg { background: linear-gradient(135deg, rgba(0,240,255,0.15), rgba(0,240,255,0.03)); }
+.eco-icon.pqc-bg { background: linear-gradient(135deg, rgba(255,136,0,0.15), rgba(255,136,0,0.03)); }
+.eco-module-info { display: flex; flex-direction: column; gap: 2px; }
 .eco-module-name {
   font-family: 'Orbitron', monospace;
-  font-size: 9px; font-weight: 700;
-  letter-spacing: 1px;
+  font-size: 8px; font-weight: 700;
+  letter-spacing: 1.5px;
 }
 .eco-module-status {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
+  font-size: 7.5px;
   color: var(--accent-green);
+  opacity: 0.8;
 }
 
-/* Tooltip */
-.tooltip {
+/* FILTER BAR */
+.filter-bar {
+  padding: 8px 12px;
+  display: flex; gap: 4px; flex-wrap: wrap;
+  border-bottom: 1px solid var(--border-color);
+}
+.filter-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7.5px;
+  padding: 3px 9px;
+  border-radius: 5px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.25s var(--transition-smooth);
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+.filter-btn.active {
+  border-color: rgba(0,240,255,0.3);
+  color: var(--accent-cyan);
+  background: rgba(0,240,255,0.06);
+}
+.filter-btn:hover {
+  border-color: rgba(0,240,255,0.2);
+  color: var(--text-primary);
+  background: rgba(0,240,255,0.03);
+}
+
+/* GLOBE TOOLTIP */
+.globe-tooltip {
   position: fixed;
-  background: rgba(10,14,23,0.95);
-  border: 1px solid var(--accent-cyan);
-  border-radius: 6px;
+  background: rgba(6,8,14,0.92);
+  border: 1px solid rgba(0,240,255,0.2);
+  border-radius: 8px;
   padding: 10px 14px;
-  font-size: 11px;
-  max-width: 280px;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  max-width: 250px;
   z-index: 999;
   pointer-events: none;
   display: none;
-  box-shadow: var(--glow-cyan);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 30px rgba(0,0,0,0.5), 0 0 15px rgba(0,240,255,0.08);
 }
 
-/* Scanline effect */
+/* SCANLINE */
 .scanline {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -505,37 +583,42 @@ svg#attackOverlay {
     0deg,
     transparent,
     transparent 2px,
-    rgba(0, 240, 255, 0.01) 2px,
-    rgba(0, 240, 255, 0.01) 4px
+    rgba(0, 240, 255, 0.008) 2px,
+    rgba(0, 240, 255, 0.008) 4px
   );
+  mix-blend-mode: overlay;
 }
 
-/* Filter controls */
-.filter-bar {
-  padding: 6px 10px;
-  display: flex; gap: 4px; flex-wrap: wrap;
-  border-bottom: 1px solid var(--border-color);
+/* CORNER ACCENTS for panels */
+.panel::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: -1px;
+  width: 20px; height: 20px;
+  border-top: 1px solid rgba(0,240,255,0.15);
+  border-left: 1px solid rgba(0,240,255,0.15);
+  border-radius: var(--panel-radius) 0 0 0;
+  pointer-events: none;
+  z-index: 1;
 }
-.filter-btn {
+
+/* Perplexity Attribution */
+.attribution {
+  position: fixed;
+  bottom: 4px;
+  right: 4px;
+  z-index: 100;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  padding: 2px 8px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.1);
-  background: transparent;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all 0.2s;
-  letter-spacing: 0.5px;
+  font-size: 7px;
+  color: var(--text-muted);
+  opacity: 0.5;
 }
-.filter-btn.active {
-  border-color: var(--accent-cyan);
+.attribution a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+.attribution a:hover {
   color: var(--accent-cyan);
-  background: rgba(0,240,255,0.1);
-}
-.filter-btn:hover {
-  border-color: var(--accent-cyan);
-  color: var(--text-primary);
 }
 </style>
 </head>
@@ -546,9 +629,23 @@ svg#attackOverlay {
 <!-- HEADER -->
 <div class="header">
   <div class="header-left">
-    <div class="logo-mark"></div>
+    <div class="logo-mark">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="14" stroke="url(#logoGrad)" stroke-width="1.5" opacity="0.6"/>
+        <ellipse cx="16" cy="16" rx="14" ry="6" stroke="url(#logoGrad)" stroke-width="1" opacity="0.4" transform="rotate(60 16 16)"/>
+        <ellipse cx="16" cy="16" rx="14" ry="6" stroke="url(#logoGrad)" stroke-width="1" opacity="0.4" transform="rotate(-60 16 16)"/>
+        <ellipse cx="16" cy="16" rx="14" ry="6" stroke="url(#logoGrad)" stroke-width="1" opacity="0.4"/>
+        <circle cx="16" cy="16" r="3" fill="url(#logoGrad)"/>
+        <defs>
+          <linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32">
+            <stop stop-color="#00f0ff"/>
+            <stop offset="1" stop-color="#ff00aa"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
     <div class="brand-text">
-      <div class="brand-name">Red Team ATOM</div>
+      <div class="brand-name">RED TEAM ATOM</div>
       <div class="brand-sub">AUTONOMOUS QUANTUM-READY RED TEAM RANGE</div>
     </div>
   </div>
@@ -582,12 +679,12 @@ svg#attackOverlay {
   </div>
 </div>
 
-<!-- ECOSYSTEM STRIP: Red Team ATOM + PQC -->
+<!-- ECO STRIP -->
 <div class="eco-strip">
   <div class="eco-module">
     <div class="eco-icon atom-bg">⚛️</div>
     <div class="eco-module-info">
-      <span class="eco-module-name" style="color:var(--accent-cyan)">Red Team ATOM</span>
+      <span class="eco-module-name" style="color:var(--accent-cyan)">RED TEAM ATOM</span>
       <span class="eco-module-status" id="atomStatus">Active adversarial simulation</span>
     </div>
   </div>
@@ -595,21 +692,18 @@ svg#attackOverlay {
     <div class="eco-icon pqc-bg">🔐</div>
     <div class="eco-module-info">
       <span class="eco-module-name" style="color:var(--accent-orange)">PQC ENGINE</span>
-      <span class="eco-module-status" id="pqcStatus">Lattice-based key rotation · HARVEST-NOW-DECRYPT-LATER SAFE</span>
+      <span class="eco-module-status" id="pqcStatus">Lattice-based key rotation</span>
     </div>
   </div>
 </div>
 
-<!-- MAP -->
-<div class="map-container">
-  <canvas id="globeCanvas"></canvas>
-  <svg id="attackOverlay"></svg>
-</div>
+<!-- GLOBE -->
+<div class="globe-container" id="globeContainer"></div>
 
 <!-- LEFT PANEL -->
 <div class="panel panel-left">
   <div class="panel-header">
-    <span class="panel-title">⚡ AI & QUANTUM ATTACK TELEMETRY</span>
+    <span class="panel-title"><span class="icon">⚡</span> AI & QUANTUM ATTACK TELEMETRY</span>
     <span class="panel-indicator"></span>
   </div>
   <div class="filter-bar">
@@ -626,7 +720,7 @@ svg#attackOverlay {
 <!-- RIGHT PANEL -->
 <div class="panel panel-right">
   <div class="panel-header">
-    <span class="panel-title">📊 THREAT ANALYTICS</span>
+    <span class="panel-title"><span class="icon">📊</span> THREAT ANALYTICS</span>
     <span class="panel-indicator"></span>
   </div>
   <div class="analytics-grid">
@@ -649,14 +743,14 @@ svg#attackOverlay {
   </div>
 
   <div class="panel-header" style="border-top: 1px solid var(--border-color);">
-    <span class="panel-title">🎯 TOP TARGETED ENDPOINTS</span>
+    <span class="panel-title"><span class="icon">🎯</span> TOP TARGETED ENDPOINTS</span>
   </div>
-  <div id="targetedModels" style="padding: 6px 10px; font-size: 10px;"></div>
+  <div id="targetedModels" class="endpoints-section"></div>
 
   <div class="agent-log-section">
     <div class="panel-header">
-      <span class="panel-title" style="color:var(--accent-magenta)">🤖 RED TEAM ATOM DEFENSE LOG</span>
-      <span class="panel-indicator" style="background:var(--accent-magenta)"></span>
+      <span class="panel-title" style="color:var(--accent-magenta)"><span class="icon">🤖</span> RED TEAM ATOM DEFENSE LOG</span>
+      <span class="panel-indicator" style="background:var(--accent-magenta);box-shadow:0 0 6px rgba(255,0,170,0.5)"></span>
     </div>
     <div class="agent-logs" id="agentLogs"></div>
   </div>
@@ -665,16 +759,25 @@ svg#attackOverlay {
 <!-- BOTTOM: ATLAS HEATMAP -->
 <div class="panel-bottom">
   <div class="panel-header">
-    <span class="panel-title">🗺️ MITRE ATLAS & QUANTUM TECHNIQUE HEATMAP</span>
-    <span style="font-family:'JetBrains Mono';font-size:8px;color:var(--text-secondary)">LAST 60 MIN</span>
+    <span class="panel-title"><span class="icon">🗺️</span> MITRE ATLAS & QUANTUM TECHNIQUE HEATMAP</span>
+    <span style="font-family:'JetBrains Mono';font-size:7px;color:var(--text-muted);letter-spacing:1px">LAST 60 MIN</span>
   </div>
   <div class="heatmap-container" id="atlasHeatmap"></div>
 </div>
 
-<div class="tooltip" id="tooltip"></div>
+<div class="globe-tooltip" id="tooltip"></div>
+
+<!-- Attribution -->
+<div class="attribution">
+  <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
+</div>
+
+<!-- THREE.JS + GLOBE.GL -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js"></script>
+<script src="https://unpkg.com/globe.gl@2.35.1/dist/globe.gl.min.js"></script>
 
 <script>
-// GEO CITIES
+// ===== GEO CITIES =====
 const CITIES = [
   {name:"Beijing",country:"CN",lat:39.9,lon:116.4},
   {name:"Shanghai",country:"CN",lat:31.2,lon:121.5},
@@ -718,7 +821,7 @@ const CITIES = [
   {name:"Helsinki",country:"FI",lat:60.2,lon:24.9}
 ];
 
-// AI-SPECIFIC ATTACK TYPES (MITRE ATLAS + Custom)
+// ===== AI-SPECIFIC ATTACK TYPES (MITRE ATLAS + Custom) =====
 const AI_ATTACKS = [
   {type:"Prompt Injection",severity:"critical",category:"ai-assisted",mitre:"AML.T0051",atlas:true,
    desc:"Multi-stage prompt injection targeting LLM guardrails via nested instruction bypass."},
@@ -766,7 +869,7 @@ const AI_ATTACKS = [
    desc:"ML-generated polymorphic payload evading signature detection."},
 ];
 
-// QUANTUM / PQC ATTACK TYPES (Quantum AI + PQC)
+// QUANTUM / PQC ATTACK TYPES
 const QUANTUM_ATTACKS = [
   {type:"Quantum-Accelerated Key Harvesting",severity:"critical",category:"quantum",mitre:"T1557-Q",atlas:false,
    desc:"Adversary using quantum resources to accelerate harvest-now-decrypt-later campaign against legacy RSA/ECC."},
@@ -789,12 +892,12 @@ const ATLAS_TECHNIQUES = [
 
 // RED TEAM ATOM AGENTS
 const AGENTS = [
-  {name:"ATOM-Hunter",color:"var(--accent-cyan)",role:"Proactive Threat Hunter"},
-  {name:"ATOM-Strike",color:"var(--accent-red)",role:"Active Response Orchestrator"},
-  {name:"ATOM-Alpha",color:"var(--accent-purple)",role:"Global Attack Chain Reasoner"},
-  {name:"ATOM-HVT",color:"var(--accent-orange)",role:"High-Value Target Guardian"},
-  {name:"ATOM-Sigma",color:"var(--accent-green)",role:"Model Integrity Sentinel"},
-  {name:"ATOM-Gamma",color:"var(--accent-yellow)",role:"Quantum Risk Analyzer"},
+  {name:"ATOM-Hunter",color:"#00f0ff",role:"Proactive Threat Hunter"},
+  {name:"ATOM-Strike",color:"#ff3344",role:"Active Response Orchestrator"},
+  {name:"ATOM-Alpha",color:"#8855ff",role:"Global Attack Chain Reasoner"},
+  {name:"ATOM-HVT",color:"#ff8800",role:"High-Value Target Guardian"},
+  {name:"ATOM-Sigma",color:"#00ff88",role:"Model Integrity Sentinel"},
+  {name:"ATOM-Gamma",color:"#ffdd00",role:"Quantum Risk Analyzer"},
 ];
 
 const AGENT_ACTIONS = [
@@ -815,16 +918,16 @@ const AGENT_ACTIONS = [
 ];
 
 const TARGET_MODELS = [
-  {name:"GPT-4o Endpoint",attacks:0,color:"var(--accent-red)"},
-  {name:"Claude Prod API",attacks:0,color:"var(--accent-orange)"},
-  {name:"Gemini Vision",attacks:0,color:"var(--accent-yellow)"},
-  {name:"ATOM-Core v3.1",attacks:0,color:"var(--accent-cyan)"},
-  {name:"LLaMA-3 Fine-tune",attacks:0,color:"var(--accent-purple)"},
-  {name:"PQC Engine",attacks:0,color:"var(--accent-green)"},
-  {name:"Mistral-Large",attacks:0,color:"var(--accent-magenta)"},
+  {name:"GPT-4o Endpoint",attacks:0,color:"#ff3344"},
+  {name:"Claude Prod API",attacks:0,color:"#ff8800"},
+  {name:"Gemini Vision",attacks:0,color:"#ffdd00"},
+  {name:"ATOM-Core v3.1",attacks:0,color:"#00f0ff"},
+  {name:"LLaMA-3 Fine-tune",attacks:0,color:"#8855ff"},
+  {name:"PQC Engine",attacks:0,color:"#00ff88"},
+  {name:"Mistral-Large",attacks:0,color:"#ff00aa"},
 ];
 
-// STATE
+// ===== STATE =====
 let state = {
   totalAttacks: 14847,
   aiAssisted: 3291,
@@ -840,7 +943,7 @@ let state = {
 
 ATLAS_TECHNIQUES.forEach(t => state.atlasHeat[t] = Math.floor(Math.random() * 40) + 5);
 
-// UTIL
+// ===== UTIL =====
 function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 function timestamp() {
@@ -851,175 +954,153 @@ function genIP() {
   return `${randInt(1,223)}.${randInt(0,255)}.${randInt(0,255)}.${randInt(1,254)}`;
 }
 
-// MAP
-const canvas = document.getElementById('globeCanvas');
-const ctx = canvas.getContext('2d');
-const svg = document.getElementById('attackOverlay');
+// ===== 3D INTERACTIVE GLOBE =====
+let globe;
+let arcsData = [];
+let ringsData = [];
+let pointsData = [];
 
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  svg.setAttribute('viewBox', `0 0 ${window.innerWidth} ${window.innerHeight}`);
-}
-window.addEventListener('resize', () => { resizeCanvas(); drawMap(); });
-resizeCanvas();
+function initGlobe() {
+  const container = document.getElementById('globeContainer');
 
-function project(lat, lon) {
-  const x = (lon + 180) / 360 * canvas.width;
-  const y = (1 - (Math.log(Math.tan(Math.PI/4 + lat * Math.PI/360)) / Math.PI)) / 2 * canvas.height;
-  return {x, y};
-}
+  // City points for the globe
+  pointsData = CITIES.map(c => ({
+    lat: c.lat,
+    lng: c.lon,
+    name: c.name,
+    country: c.country,
+    size: 0.35,
+    color: 'rgba(0, 240, 255, 0.7)'
+  }));
 
-function generateRegionDots(latMin, latMax, lonMin, lonMax, density) {
-  const dots = [];
-  const step = 2;
-  for (let lat = latMin; lat <= latMax; lat += step) {
-    for (let lon = lonMin; lon <= lonMax; lon += step) {
-      if (Math.random() < density) dots.push({lat, lon});
+  globe = Globe()
+    .globeImageUrl('https://unpkg.com/three-globe@2.35.1/example/img/earth-night.jpg')
+    .bumpImageUrl('https://unpkg.com/three-globe@2.35.1/example/img/earth-topology.png')
+    .backgroundImageUrl('')
+    .backgroundColor('rgba(0,0,0,0)')
+    .atmosphereColor('#00f0ff')
+    .atmosphereAltitude(0.18)
+    .showGraticules(true)
+
+    // Points (cities)
+    .pointsData(pointsData)
+    .pointAltitude('size')
+    .pointColor('color')
+    .pointRadius(0.25)
+    .pointsMerge(true)
+
+    // Arcs (attack lines)
+    .arcsData(arcsData)
+    .arcColor('color')
+    .arcAltitude(d => d.arcAlt)
+    .arcStroke(d => d.stroke)
+    .arcDashLength(0.6)
+    .arcDashGap(0.3)
+    .arcDashAnimateTime(d => d.dashTime)
+    .arcsTransitionDuration(0)
+
+    // Rings (impact pulses)
+    .ringsData(ringsData)
+    .ringColor(d => t => `rgba(${d.rgb},${1 - t})`)
+    .ringMaxRadius(4)
+    .ringPropagationSpeed(2.5)
+    .ringRepeatPeriod(1500)
+    (container);
+
+  // Globe material customization (safe access to THREE)
+  try {
+    const globeMaterial = globe.globeMaterial();
+    globeMaterial.bumpScale = 3;
+    // Access THREE from globe.gl's bundled version
+    const THREE_REF = window.THREE || (globe.scene && globe.scene().constructor && Object.getPrototypeOf(globe.scene()).constructor.prototype.constructor.__proto__);
+    if (window.THREE) {
+      globeMaterial.emissive = new THREE.Color(0x061428);
+      globeMaterial.emissiveIntensity = 0.15;
+      globeMaterial.shininess = 0.7;
+      const scene = globe.scene();
+      const ambientLight = new THREE.AmbientLight(0x1a2a4a, 0.6);
+      scene.add(ambientLight);
     }
+  } catch(e) { console.warn('Globe material customization skipped:', e.message); }
+
+  // Camera positioning
+  globe.pointOfView({ lat: 25, lng: 10, altitude: 2.2 });
+
+  // Auto-rotate
+  globe.controls().autoRotate = true;
+  globe.controls().autoRotateSpeed = 0.3;
+  globe.controls().enableDamping = true;
+  globe.controls().dampingFactor = 0.1;
+  globe.controls().minDistance = 120;
+  globe.controls().maxDistance = 500;
+
+  // Responsive
+  function handleResize() {
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    globe.width(w);
+    globe.height(h);
   }
-  return dots;
-}
-const worldDots = [
-  ...generateRegionDots(25, 70, -170, -50, 0.65),
-  ...generateRegionDots(-55, 15, -82, -35, 0.6),
-  ...generateRegionDots(35, 72, -10, 40, 0.75),
-  ...generateRegionDots(-35, 37, -18, 52, 0.6),
-  ...generateRegionDots(5, 75, 40, 180, 0.55),
-  ...generateRegionDots(-45, -10, 112, 155, 0.6),
-];
-
-function drawMap() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const grad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, canvas.width * 0.7);
-  grad.addColorStop(0, '#0d1a2d');
-  grad.addColorStop(1, '#060a12');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  ctx.strokeStyle = 'rgba(0, 240, 255, 0.03)';
-  ctx.lineWidth = 0.5;
-  for (let lat = -80; lat <= 80; lat += 20) {
-    ctx.beginPath();
-    const p1 = project(lat, -180);
-    const p2 = project(lat, 180);
-    ctx.moveTo(p1.x, p1.y);
-    ctx.lineTo(p2.x, p2.y);
-    ctx.stroke();
-  }
-  for (let lon = -180; lon <= 180; lon += 30) {
-    ctx.beginPath();
-    const p1 = project(-80, lon);
-    const p2 = project(80, lon);
-    ctx.moveTo(p1.x, p1.y);
-    ctx.lineTo(p2.x, p2.y);
-    ctx.stroke();
-  }
-
-  worldDots.forEach(d => {
-    const p = project(d.lat, d.lon);
-    ctx.fillStyle = 'rgba(0, 240, 255, 0.12)';
-    ctx.fillRect(p.x, p.y, 2, 2);
-  });
-
-  CITIES.forEach(city => {
-    const p = project(city.lat, city.lon);
-    ctx.fillStyle = 'rgba(0, 240, 255, 0.4)';
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-    ctx.fill();
-  });
+  window.addEventListener('resize', handleResize);
+  handleResize();
 }
 
-// ATTACK ARCS
-let arcId = 0;
-function createAttackArc(from, to, severity, isQuantum=false) {
-  const p1 = project(from.lat, from.lon);
-  const p2 = project(to.lat, to.lon);
-
-  const midX = (p1.x + p2.x) / 2;
-  const midY = (p1.y + p2.y) / 2;
-  const dist = Math.sqrt((p2.x-p1.x)**2 + (p2.y-p1.y)**2);
-  const curveHeight = Math.min(dist * 0.3, 100);
-  const cpX = midX;
-  const cpY = midY - curveHeight;
-
-  const colors = {
-    critical: isQuantum ? '#00f0ff' : '#ff3344',
-    high: isQuantum ? '#00bfff' : '#ff8800',
-    medium: isQuantum ? '#33ffdd' : '#ffdd00',
-    low: '#00ff88'
+function createGlobeArc(from, to, severity, isQuantum) {
+  const severityColors = {
+    critical: isQuantum ? ['rgba(0,240,255,0.9)', 'rgba(0,240,255,0.3)'] : ['rgba(255,51,68,0.9)', 'rgba(255,51,68,0.3)'],
+    high: isQuantum ? ['rgba(0,191,255,0.8)', 'rgba(0,191,255,0.2)'] : ['rgba(255,136,0,0.8)', 'rgba(255,136,0,0.2)'],
+    medium: isQuantum ? ['rgba(51,255,221,0.7)', 'rgba(51,255,221,0.2)'] : ['rgba(255,221,0,0.7)', 'rgba(255,221,0,0.2)'],
+    low: ['rgba(0,255,136,0.7)', 'rgba(0,255,136,0.2)']
   };
-  const color = colors[severity] || colors.medium;
+  const colors = severityColors[severity] || severityColors.medium;
 
-  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  path.setAttribute('d', `M ${p1.x} ${p1.y} Q ${cpX} ${cpY} ${p2.x} ${p2.y}`);
-  path.setAttribute('stroke', color);
-  path.setAttribute('stroke-width', severity === 'critical' ? '2.5' : '1.5');
-  path.setAttribute('fill', 'none');
-  path.setAttribute('stroke-linecap', 'round');
-  path.setAttribute('opacity', '0');
-  path.setAttribute('filter', `drop-shadow(0 0 4px ${color})`);
+  const arc = {
+    startLat: from.lat,
+    startLng: from.lon,
+    endLat: to.lat,
+    endLng: to.lon,
+    color: colors,
+    arcAlt: severity === 'critical' ? 0.25 + Math.random() * 0.15 : 0.1 + Math.random() * 0.1,
+    stroke: severity === 'critical' ? 0.8 : 0.4,
+    dashTime: 1500 + Math.random() * 1000,
+    _ts: Date.now()
+  };
 
-  const length = path.getTotalLength ? path.getTotalLength() : dist;
-  path.style.strokeDasharray = length;
-  path.style.strokeDashoffset = length;
+  arcsData.push(arc);
+  globe.arcsData([...arcsData]);
 
-  svg.appendChild(path);
+  // Ring at destination
+  const rgbMap = {
+    critical: isQuantum ? '0,240,255' : '255,51,68',
+    high: isQuantum ? '0,191,255' : '255,136,0',
+    medium: isQuantum ? '51,255,221' : '255,221,0',
+    low: '0,255,136'
+  };
 
-  requestAnimationFrame(() => {
-    path.style.transition = 'stroke-dashoffset 1.8s ease-in-out, opacity 0.3s';
-    path.style.opacity = '0.7';
-    path.style.strokeDashoffset = '0';
-  });
+  const ring = {
+    lat: to.lat,
+    lng: to.lon,
+    rgb: rgbMap[severity] || '0,240,255',
+    _ts: Date.now()
+  };
+  ringsData.push(ring);
+  globe.ringsData([...ringsData]);
 
-  drawPulse(p1.x, p1.y, color);
-  setTimeout(() => drawPulse(p2.x, p2.y, color), 900);
+  // Remove old arcs/rings after timeout
+  setTimeout(() => {
+    arcsData = arcsData.filter(a => a !== arc);
+    globe.arcsData([...arcsData]);
+  }, 3500);
 
   setTimeout(() => {
-    path.style.opacity = '0';
-    setTimeout(() => path.remove(), 500);
-  }, 2500);
+    ringsData = ringsData.filter(r => r !== ring);
+    globe.ringsData([...ringsData]);
+  }, 4000);
 }
 
-function drawPulse(x, y, color) {
-  const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-  circle.setAttribute('cx', x);
-  circle.setAttribute('cy', y);
-  circle.setAttribute('r', '3');
-  circle.setAttribute('fill', color);
-  circle.setAttribute('opacity', '0.8');
-  circle.setAttribute('filter', `drop-shadow(0 0 6px ${color})`);
-  svg.appendChild(circle);
-
-  const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-  ring.setAttribute('cx', x);
-  ring.setAttribute('cy', y);
-  ring.setAttribute('r', '3');
-  ring.setAttribute('fill', 'none');
-  ring.setAttribute('stroke', color);
-  ring.setAttribute('stroke-width', '1');
-  ring.setAttribute('opacity', '0.6');
-  svg.appendChild(ring);
-
-  let r = 3;
-  let op = 0.6;
-  const animate = () => {
-    r += 0.8;
-    op -= 0.02;
-    ring.setAttribute('r', r);
-    ring.setAttribute('opacity', Math.max(0, op));
-    if (op > 0) requestAnimationFrame(animate);
-    else ring.remove();
-  };
-  requestAnimationFrame(animate);
-
-  setTimeout(() => circle.remove(), 3000);
-}
-
-// ATTACK GENERATION (AI + QUANTUM)
+// ===== ATTACK GENERATION =====
 function generateAttack() {
-  const isQuantum = Math.random() < 0.18; // ~18% are quantum/PQC themed
+  const isQuantum = Math.random() < 0.18;
   const attack = isQuantum ? rand(QUANTUM_ATTACKS) : rand(AI_ATTACKS);
   const src = rand(CITIES);
   let dst = rand(CITIES);
@@ -1050,7 +1131,7 @@ function generateAttack() {
 
   rand(TARGET_MODELS).attacks++;
 
-  createAttackArc(src, dst, attack.severity, isQuantum);
+  createGlobeArc(src, dst, attack.severity, isQuantum);
   addAttackToFeed(entry);
   if (Math.random() > 0.3) setTimeout(() => generateAgentLog(entry), randInt(200, 1200));
 
@@ -1087,7 +1168,7 @@ function addAttackToFeed(entry) {
       <span>${entry.src.name}, ${entry.src.country}</span> → <span>${entry.dst.name}, ${entry.dst.country}</span>
     </div>
     <div class="attack-detail">${entry.desc}</div>
-    <div class="attack-detail" style="margin-top:2px;color:rgba(0,240,255,0.5)">
+    <div class="attack-detail" style="margin-top:2px;color:rgba(0,240,255,0.3)">
       ${entry.ip_src} → ${entry.ip_dst}
     </div>
     <div class="attack-tags">${tags.join('')}</div>
@@ -1124,7 +1205,7 @@ function generateAgentLog(attack) {
   while (logs.children.length > 40) logs.removeChild(logs.lastChild);
 }
 
-// FILTER
+// ===== FILTER =====
 function setFilter(f) {
   state.filter = f;
   document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -1141,7 +1222,7 @@ function setFilter(f) {
   document.getElementById('attackFeed').innerHTML = '';
 }
 
-// STATS / MODELS / HEATMAP
+// ===== STATS / MODELS / HEATMAP =====
 function updateStats() {
   document.getElementById('totalAttacks').textContent = state.totalAttacks.toLocaleString();
   document.getElementById('aiAssisted').textContent = state.aiAssisted.toLocaleString();
@@ -1155,9 +1236,12 @@ function updateStats() {
   const sorted = [...TARGET_MODELS].sort((a,b) => b.attacks - a.attacks);
   const modelsDiv = document.getElementById('targetedModels');
   modelsDiv.innerHTML = sorted.slice(0, 5).map(m => `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;font-family:'JetBrains Mono',monospace;">
-      <span style="color:${m.color};font-size:9px;">● ${m.name}</span>
-      <span style="color:var(--text-secondary);font-size:9px;">${m.attacks} hits</span>
+    <div class="endpoint-row">
+      <span class="endpoint-name">
+        <span class="endpoint-dot" style="background:${m.color};box-shadow:0 0 4px ${m.color}"></span>
+        <span style="color:${m.color}">${m.name}</span>
+      </span>
+      <span class="endpoint-hits">${m.attacks} hits</span>
     </div>
   `).join('');
 }
@@ -1165,20 +1249,17 @@ function updateStats() {
 function renderHeatmap() {
   const container = document.getElementById('atlasHeatmap');
   container.innerHTML = '';
-
   const maxVal = Math.max(...Object.values(state.atlasHeat));
 
   ATLAS_TECHNIQUES.forEach(tech => {
     const val = state.atlasHeat[tech];
     const pct = (val / maxVal) * 100;
-    const hue = tech === "Quantum/PQC"
-      ? 190
-      : 120 - (pct / 100) * 120;
+    const hue = tech === "Quantum/PQC" ? 190 : 120 - (pct / 100) * 120;
 
     const col = document.createElement('div');
     col.className = 'heatmap-col';
     col.innerHTML = `
-      <div class="heatmap-bar" style="height:${Math.max(8, pct * 0.7)}px;background:hsl(${hue},80%,50%);box-shadow:0 0 6px hsla(${hue},80%,50%,0.4);"></div>
+      <div class="heatmap-bar" style="height:${Math.max(6, pct * 0.65)}px;background:hsl(${hue},75%,48%);box-shadow:0 0 8px hsla(${hue},75%,48%,0.3);"></div>
       <div class="heatmap-label">${tech}</div>
     `;
     col.title = `${tech}: ${val} events`;
@@ -1186,11 +1267,10 @@ function renderHeatmap() {
   });
 }
 
-// ECOSYSTEM: Red Team ATOM + PQC
+// ===== ECOSYSTEM =====
 function updateEcosystem() {
   const signals = randInt(900, 1600);
   document.getElementById('atomStatus').textContent = `Simulating ${signals} attack signals/s`;
-
   const pqcStates = [
     "Lattice KEM: ACTIVE · Hybrid TLS",
     "XMSS: ROTATING SIGNATURE KEYS",
@@ -1198,11 +1278,10 @@ function updateEcosystem() {
     "HARVEST-NOW-DECRYPT-LATER RESILIENT"
   ];
   document.getElementById('pqcStatus').textContent = pqcStates[randInt(0, pqcStates.length - 1)];
-
   state.modelsScanned += randInt(2, 7);
 }
 
-// DATETIME
+// ===== DATETIME =====
 function updateDateTime() {
   const d = new Date();
   document.getElementById('datetime').innerHTML =
@@ -1210,7 +1289,7 @@ function updateDateTime() {
     '<br>' + d.toLocaleTimeString('en-US', {hour12:false}) + ' EST';
 }
 
-// THREAT LEVEL
+// ===== THREAT LEVEL =====
 function updateThreatLevel() {
   const levels = [
     {name: 'CRITICAL', color: '#ff3344'},
@@ -1221,25 +1300,33 @@ function updateThreatLevel() {
   const el = document.getElementById('threatLevel');
   el.textContent = level.name;
   el.style.color = level.color;
+  el.parentElement.style.borderColor = level.color + '33';
+  el.parentElement.style.background = level.color + '0a';
+  el.parentElement.querySelector('.threat-dot').style.background = level.color;
+  el.parentElement.querySelector('.threat-dot').style.boxShadow = `0 0 8px ${level.color}80`;
 }
 
-// INIT
+// ===== INIT =====
 function init() {
-  drawMap();
+  initGlobe();
   updateDateTime();
   updateStats();
   renderHeatmap();
   updateEcosystem();
 
-  (function scheduleAttack() {
-    generateAttack();
-    const delay = randInt(400, 2200);
-    setTimeout(scheduleAttack, delay);
-  })();
+  // Staggered start for attack generation
+  setTimeout(() => {
+    (function scheduleAttack() {
+      generateAttack();
+      const delay = randInt(500, 2500);
+      setTimeout(scheduleAttack, delay);
+    })();
+  }, 1000);
 
+  // Burst attacks
   setInterval(() => {
-    const burst = randInt(3, 8);
-    for (let i = 0; i < burst; i++) setTimeout(generateAttack, i * 150);
+    const burst = randInt(3, 7);
+    for (let i = 0; i < burst; i++) setTimeout(generateAttack, i * 200);
   }, randInt(8000, 15000));
 
   setInterval(renderHeatmap, 3000);
